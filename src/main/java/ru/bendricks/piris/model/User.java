@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -26,9 +27,6 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-
-//    @Transient
-//    private String password;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -121,5 +119,8 @@ public class User {
 
     @Column(name = "monthly_income")
     private long monthlyIncome;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Account> accounts;
 
 }
