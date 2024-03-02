@@ -22,7 +22,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    @Column(name = "status")
+    private RecordStatus status;
 
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -122,5 +125,8 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Account> accounts;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Obligation> obligations;
 
 }

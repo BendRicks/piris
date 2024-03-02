@@ -1,20 +1,12 @@
 package ru.bendricks.piris.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,8 +18,17 @@ import java.util.UUID;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "acc_type", nullable = false)
+    @ManyToOne
+    private AccountType accountType;
+
+    @Column(name = "status")
+    private RecordStatus status;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
@@ -36,15 +37,17 @@ public class Account {
     @Column(name = "balance", nullable = false)
     private long balance;
 
-//    @Column(name = "acc_type", nullable = false)
-//    private AccountType accountType;
+    @Column(name = "currency")
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
-//    @OneToOne(mappedBy = "parentAccount", cascade = CascadeType.ALL)
-//    @JoinColumn(name = "parent_acc_id", referencedColumnName = "id")
-//    private Account parentAccount;
-//
-//    @OneToOne(mappedBy = "childAccount", cascade = CascadeType.ALL)
-//    @JoinColumn(name = "child_acc_id", referencedColumnName = "id")
-//    private Account childAccount;
+    @OneToOne
+    private Obligation parentObligation;
+
+    @OneToMany(mappedBy = "sender")
+    private List<Transaction> transactionsAsSender;
+
+    @OneToMany(mappedBy = "recipient")
+    private List<Transaction> transactionsAsRecipient;
 
 }

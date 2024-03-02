@@ -1,25 +1,39 @@
 package ru.bendricks.piris.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "obligation")
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Obligation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "obligation_plan_id", referencedColumnName = "id")
+    private ObligationPlan obligationPlan;
+
+    @Column(name = "obligation_type")
+    @Enumerated(EnumType.ORDINAL)
+    private ObligationType obligationType;
+
+    @Column(name = "status")
+    private RecordStatus status;
 
     @Column(name = "contract_number")
+    @NotBlank
     private String contractNumber;
 
     @Column(name = "creation_time")
@@ -28,6 +42,23 @@ public class Obligation {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
+    @Column(name = "currency")
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
+    @Column(name = "amount")
+    private long amount;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "main_acc_id", referencedColumnName = "id")
+    private Account mainAccount;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "percent_acc_id", referencedColumnName = "id")
+    private Account percentAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    private User owner;
 
 }
