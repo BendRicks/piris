@@ -204,6 +204,8 @@
 <div class="modal-window-content-row">
     <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
     <a href="/auth/edit/${user.id}">Изменить</a>
+    <a href="/obligation/user/${user.id}">Договоры</a>
+    <a href="/account/user/${user.id}">Счета</a>
 </div>
                 `
                 modal.style.display = 'block'

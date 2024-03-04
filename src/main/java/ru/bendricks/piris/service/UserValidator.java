@@ -8,6 +8,7 @@ import ru.bendricks.piris.model.User;
 
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
@@ -25,7 +26,8 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         User user = (User) target;
-        if (LocalDate.now().until(user.getBirthDate()).getYears() < 16)
+
+        if (user.getBirthDate().until(LocalDate.now(), ChronoUnit.YEARS) < 16)
             errors.rejectValue("birthDate", "not.old.enough", "Младше 16 лет");
         if (userService.isEmailUsed(user.getEmail()))
             errors.rejectValue("email", "already.in.use", "Данный email уже используется");

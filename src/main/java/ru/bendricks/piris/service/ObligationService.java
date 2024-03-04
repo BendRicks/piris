@@ -7,14 +7,14 @@ import org.hibernate.query.sqm.TemporalUnit;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import ru.bendricks.piris.model.Account;
-import ru.bendricks.piris.model.Obligation;
-import ru.bendricks.piris.model.ObligationType;
-import ru.bendricks.piris.model.RecordStatus;
+import ru.bendricks.piris.dto.ObligationCreateDTO;
+import ru.bendricks.piris.model.*;
+import ru.bendricks.piris.repository.ObligationPlanRepository;
 import ru.bendricks.piris.repository.ObligationRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,19 +23,26 @@ import java.util.List;
 public class ObligationService {
 
     private final ObligationRepository obligationRepository;
+    private final ObligationPlanRepository obligationPlanRepository;
     private final AccountService accountService;
     private final UserService userService;
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public Obligation createDepositObligation(Obligation obligation, long openBalance) throws Exception {
+    public Obligation createDepositObligation(ObligationCreateDTO createDTO) throws Exception {
+        var obligation = createDTO.getObligation();
+        obligation.setEndTime(obligation.getStartTime().plus(createDTO.getMonths(), ChronoUnit.MONTHS));
+        var obligationPlan = obligationPlanRepository.getReferenceById(obligation.getObligationPlan().getId());
+        obligation.setObligationType(obligationPlan.getObligationType());
+        obligation.setAmount(createDTO.getStartBalance());
+        obligation.setCurrency(obligationPlan.getCurrency());
         obligation.setStatus(RecordStatus.ACTIVE);
-        if (obligation.getStartTime().until(obligation.getEndTime(), ChronoUnit.MONTHS) > obligation.getObligationPlan().getMonths())
-            throw new Exception("Невозможно назначить депозит больше чем на " + obligation.getObligationPlan().getMonths() + " месяцев");
+//        if (obligation.getStartTime().until(obligation.getEndTime(), ChronoUnit.MONTHS) > obligation.getObligationPlan().getMonths())
+//            throw new Exception("Невозможно назначить депозит больше чем на " + obligation.getObligationPlan().getMonths() + " месяцев");
 //        var now = LocalDateTime.now();
 //        obligation.setStartTime(now);
 //        obligation.setEndTime(now.plus(obligation.getObligationPlan().getMonths(), ChronoUnit.MONTHS));
-        accountService.createDepositAccount(obligation, openBalance);
+        accountService.createDepositAccount(obligation);
         return obligationRepository.save(obligation);
     }
 
@@ -64,6 +71,26 @@ public class ObligationService {
                         }
                     }
                 });
+    }
+
+    public List<ObligationPlan> getObligationPlansByObligationType(ObligationType ... obligationTypes) {
+        List<ObligationPlan> plans = new ArrayList<>();
+        for (var type : obligationTypes) {
+            plans.addAll(obligationPlanRepository.findAllByObligationType(type));
+        }
+        return plans;
+    }
+
+    public List<Obligation> getObligationsByUserId(Long userId) {
+        return obligationRepository.findAllByOwnerId(userId);
+    }
+
+    public Obligation getObligationById(Long obligationId) {
+        return obligationRepository.findById(obligationId).orElse(null);
+    }
+
+    public boolean existsByContractNumber(String contractNumber) {
+        return obligationRepository.existsByContractNumber(contractNumber);
     }
 
 }

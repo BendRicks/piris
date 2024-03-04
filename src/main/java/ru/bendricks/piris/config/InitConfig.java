@@ -24,12 +24,18 @@ public class InitConfig {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
-    @Value("${sfrbUUIDByn}")
-    private UUID sfrbUUIDByn;
-    @Value("${sfrbUUIDUsd}")
-    private UUID sfrbUUIDUsd;
-    @Value("${sfrbUUIDEur}")
-    private UUID sfrbUUIDEur;
+//    @Value("${sfrbUUIDByn}")
+//    private UUID sfrbUUIDByn;
+//    @Value("${sfrbUUIDUsd}")
+//    private UUID sfrbUUIDUsd;
+//    @Value("${sfrbUUIDEur}")
+//    private UUID sfrbUUIDEur;
+    @Value("${sfrbIBANByn}")
+    private String sfrbIBANByn;
+    @Value("${sfrbIBANUsd}")
+    private String sfrbIBANUsd;
+    @Value("${sfrbIBANEur}")
+    private String sfrbIBANEur;
 
     @PostConstruct
     public void init() {
@@ -55,29 +61,29 @@ public class InitConfig {
         if (accountTypeRepository.count() == 0) {
 //            accountTypeRepository.save(new AccountType(3012, "Текущий счёт юридического лица"));
 //            accountTypeRepository.save(new AccountType(3013, "Текущий счёт индивидуального предпринимателя"));
-            accountTypeRepository.save(new AccountType(3014, "Текущий счёт физического лица"));
+            accountTypeRepository.save(new AccountType(3014, "Текущий счёт физического лица", null));
 //            accountTypeRepository.save(new AccountType(3402, "Депозитный счёт юридического лица"));
 //            accountTypeRepository.save(new AccountType(3403, "Депозитный счёт индивидуального предпринимателя"));
-            accountTypeRepository.save(new AccountType(3404, "Депозитный счёт физического лица"));
-            accountTypeRepository.save(new AccountType(3470, "Начисленные процентные расходы по вкладам"));
+            accountTypeRepository.save(new AccountType(3404, "Депозитный счёт физического лица", null));
+            accountTypeRepository.save(new AccountType(3470, "Начисленные процентные расходы по вкладам", null));
 //            accountTypeRepository.save(new AccountType(2300, "Кредитный счёт юридического лица"));
 //            accountTypeRepository.save(new AccountType(2100, "Кредитный счёт индивидуального предпринимателя"));
-            accountTypeRepository.save(new AccountType(2400, "Кредитный счёт физического лица"));
-            accountTypeRepository.save(new AccountType(2470, "Начисленные процентные доходы по займам физическим лицам"));
-            accountTypeRepository.save(new AccountType(1010, "Касса банка"));
-            accountTypeRepository.save(new AccountType(7327, "Фонд развития банка"));
+            accountTypeRepository.save(new AccountType(2400, "Кредитный счёт физического лица", null));
+            accountTypeRepository.save(new AccountType(2470, "Начисленные процентные доходы по займам физическим лицам", null));
+            accountTypeRepository.save(new AccountType(1010, "Касса банка", null));
+            accountTypeRepository.save(new AccountType(7327, "Фонд развития банка", null));
         }
-        if (accountRepository.findById(sfrbUUIDByn).isEmpty()) {
+        if (accountRepository.findById(sfrbIBANByn).isEmpty()) {
             log.info("Счет СФРБ(BYN) не был найден. Будет создана запись");
-            accountRepository.saveAndFlush(new Account(sfrbUUIDByn, "Счёт Фонда Развития Банка BYN", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 10000000000000L, Currency.BYN, null, null, null));
+            accountRepository.saveAndFlush(new Account(sfrbIBANByn, "Счёт Фонда Развития Банка BYN", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 10000000000000L, Currency.BYN, null, null, null));
         }
-        if (accountRepository.findById(sfrbUUIDUsd).isEmpty()) {
+        if (accountRepository.findById(sfrbIBANUsd).isEmpty()) {
             log.info("Счет СФРБ(USD) не был найден. Будет создана запись");
-            accountRepository.saveAndFlush(new Account(sfrbUUIDUsd, "Счёт Фонда Развития Банка USD", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 100000000L, Currency.USD, null, null, null));
+            accountRepository.saveAndFlush(new Account(sfrbIBANUsd, "Счёт Фонда Развития Банка USD", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 100000000L, Currency.USD, null, null, null));
         }
-        if (accountRepository.findById(sfrbUUIDEur).isEmpty()) {
+        if (accountRepository.findById(sfrbIBANEur).isEmpty()) {
             log.info("Счет СФРБ(EUR) не был найден. Будет создана запись");
-            accountRepository.saveAndFlush(new Account(sfrbUUIDEur, "Счёт Фонда Развития Банка EUR", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 100000000L, Currency.EUR, null, null, null));
+            accountRepository.saveAndFlush(new Account(sfrbIBANEur, "Счёт Фонда Развития Банка EUR", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 100000000L, Currency.EUR, null, null, null));
         }
     }
 

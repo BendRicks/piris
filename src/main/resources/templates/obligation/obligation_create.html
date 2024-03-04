@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+<body class="main">
+<!--/*@thymesVar id="url" type="java.lang.String"*/-->
+<!--/*@thymesVar id="obligation" type="ru.bendricks.piris.dto.ObligationCreateDTO"*/-->
+<form method="post" style="margin-top: 100px" th:action="${url}" th:object="${obligation}" class="register-form register-fix">
+    <h2 class="register-form-header">Создание депозита</h2>
+<!--    <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">-->
+    <!--/*@thymesVar id="userId" type="java.lang.Long"*/-->
+    <input type="hidden" th:field="*{obligation.owner.id}" th:value="${userId}">
+    <label class="input-label">
+        Номер договора
+        <!--/*@thymesVar id="contractNumber" type="java.lang.String"*/-->
+        <input readonly required type="text" class="text-input" th:field="*{obligation.contractNumber}" th:value="${contractNumber}">
+    </label>
+    <p th:if="${#fields.hasErrors('obligation.contractNumber')}" class="error-text" th:errors="*{obligation.contractNumber}"></p>
+    <label class="input-label">
+        Дата начала договора
+        <input required type="date" class="text-input" th:field="*{obligation.startTime}">
+    </label>
+    <p th:if="${#fields.hasErrors('obligation.startTime')}" class="error-text" th:errors="*{obligation.startTime}"></p>
+    <label class="input-label">
+        Депозитный план
+        <select required th:field="*{obligation.obligationPlan.id}">
+            <!--/*@thymesVar id="plans" type="java.util.List<ru.bendricks.piris.model.ObligationPlan>"*/-->
+            <option th:each="planOpt : ${plans}" th:value="${planOpt.getId()}" th:text="${planOpt.getName().concat(' ').concat(planOpt.getCurrency().toString()).concat(' ').concat(planOpt.getPlanPercent()).concat('% ').concat(planOpt.months).concat(' месяцев макс.')}"></option>
+        </select>
+    </label>
+    <p th:if="${#fields.hasErrors('obligation.obligationPlan.id')}" class="error-text" th:errors="*{obligation.obligationPlan.id}"></p>
+    <label class="input-label">
+        Стартовый баланс
+        <input required type="number" class="text-input" th:field="*{startBalance}" pattern="[A-Z]{2}\d{7}">
+    </label>
+    <p th:if="${#fields.hasErrors('startBalance')}" class="error-text" th:errors="*{startBalance}"></p>
+    <label class="input-label">
+        Количество месяцев
+        <input required type="text" class="text-input" th:field="*{months}">
+    </label>
+    <p th:if="${#fields.hasErrors('months')}" class="error-text" th:errors="*{months}"></p>
+    <input type="submit" value="Sign Up"/>
+    <label class="input-label">
+        IBAN платёжного счёта
+        <input required type="text" class="text-input" th:field="*{months}" list="ibans">
+        <datalist id="ibans">
+            <!--/*@thymesVar id="ibans" type="java.util.List<java.lang.String>"*/-->
+            <option th:each="iban : ${ibans}" th:value="${iban}"></option>
+        </datalist>
+    </label>
+    <p th:if="${#fields.hasErrors('months')}" class="error-text" th:errors="*{months}"></p>
+</form>
+</body>
+</html>

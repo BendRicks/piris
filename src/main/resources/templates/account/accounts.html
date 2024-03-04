@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <script th:inline="javascript">
+        var _csrfToken = [[${_csrf.token}]]
+        var userId = [[${userId}]]
+    </script>
+</head>
+<body class="main main-dop">
+<div class="modal-container" id="modal" style="display: none">
+    <div class="modal-background" id="modal-bg"></div>
+    <div class="modal-window">
+        <div class="modal-window-header">
+            <h2 class="modal-window-header-text">Данные договора</h2>
+            <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
+                 height="20px" width="20px" version="1.1" id="modal-header-cross" viewBox="0 0 490 490"
+                 xml:space="preserve">
+                <polygon
+                        points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
+            </svg>
+        </div>
+        <div class="modal-window-content" id="modal-content">
+
+        </div>
+    </div>
+</div>
+<!--/*@thymesVar id="user" type="ru.bendricks.piris.model.User"*/-->
+<!--/*@thymesVar id="userId" type="java.lang.Long"*/-->
+<a th:href="${'/account/payment/create?userId='+userId}">Создать платежный счёт</a>
+<div class="users-items-container" id="obligations-container">
+    <!--/*@thymesVar id="users" type="java.util.List<ru.bendricks.piris.model.User>"*/-->
+    <h2>Договора</h2>
+    <!--    <div th:each="user : ${users}" class="user-item">-->
+    <!--        <h2></h2>-->
+    <!--    </div>-->
+    <script>
+        window.onload = async () => {
+
+            document.getElementById("modal-header-cross").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
+
+            document.getElementById("modal-bg").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
+
+            await getObligations();
+        }
+
+        // async function deleteUser(id) {
+        //     let response = await fetch(`/auth/user/${id}`, {
+        //         method: 'DELETE',
+        //         headers: {
+        //             'X-CSRF-TOKEN': _csrfToken
+        //         }
+        //     })
+        //     if (response.status == 200) {
+        //         document.getElementById(`user_${id}`).remove()
+        //     }
+        //     document.getElementById("modal").style.display = 'none'
+        //     document.getElementById('modal-content').innerHTML = ''
+        // }
+
+        async function openObligationModal(id) {
+            let obligation = await getObligation(id)
+            if (obligation) {
+                let modal = document.getElementById('modal')
+                let container = document.getElementById('modal-content')
+                container.innerHTML = `
+                    <p>data.contractNumber</p>
+                    <p>data.obligationPlan.name</p>
+                    <p>data.startTime</p>
+                ` //Сюда больше данных
+                modal.style.display = 'block'
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
+
+        async function getObligation(id) {
+            let response = await fetch(`/obligation/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                return response.json()
+            }
+            return null;
+        }
+
+        async function getObligations() {
+            let response = await fetch(`/obligation/user/${userId}/all`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                let container = document.getElementById('obligations-container')
+                let innerHtml = ''
+                let data = await response.json()
+                for (const el of data) {
+                    innerHtml += `
+                        <div class="user-item" id="user_${el.id}" onclick="openObligationModal(${el.id})">
+                            <p>${el.contractNumber}</p>
+                            <p>${el.obligationPlan.name}</p>
+                        </div>
+                    `
+                }
+                container.innerHTML = innerHtml
+                // console.log()
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
+
+    </script>
+</div>
+</body>
+</html>

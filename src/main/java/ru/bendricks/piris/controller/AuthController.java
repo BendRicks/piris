@@ -3,6 +3,7 @@ package ru.bendricks.piris.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,12 +25,14 @@ public class AuthController {
     private final UserValidator userValidator;
 
     @GetMapping("/signup")
+    @PreAuthorize("hasRole('ADMIN')")
     public String getRegisterPage(User user, Model model){
         model.addAttribute("url", "/auth/signup");
         return "auth/signup";
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String getRegisterPage(Model model, @PathVariable(name = "id") long id){
         model.addAttribute("url", "/auth/edit");
         model.addAttribute("user", userService.getUserById(id));
@@ -64,5 +67,7 @@ public class AuthController {
     public void deleteUser(@PathVariable("id") long id) {
         userService.deleteUser(id);
     }
+
+    //@AuthenticationPrincipal CustomUserDetails userDetails - херня для получения объекта пользователя для проверок
 
 }

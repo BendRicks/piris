@@ -1,10 +1,7 @@
 package ru.bendricks.piris.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,18 +10,23 @@ import java.util.UUID;
 @Table(name = "account")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class Account {
 
+//    @Id
+//    private UUID id;
+
     @Id
-    private UUID id;
+    private String iban;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "acc_type", nullable = false)
+//    @Column(name = "acc_type", nullable = false)
     @ManyToOne
+    @JoinColumn(name = "acc_type_code", referencedColumnName = "code")
     private AccountType accountType;
 
     @Column(name = "status")

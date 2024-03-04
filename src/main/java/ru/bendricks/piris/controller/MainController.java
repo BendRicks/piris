@@ -2,6 +2,7 @@ package ru.bendricks.piris.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class MainController {
     private final UserService userService;
 
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     public String getUsersPage(Model model) {
         return "user/users_page";
     }
@@ -33,6 +35,7 @@ public class MainController {
 
     @GetMapping("/user/{id}")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable(name = "id") long id){
         User user = userService.getUserById(id);

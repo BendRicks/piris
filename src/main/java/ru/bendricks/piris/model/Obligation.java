@@ -2,10 +2,7 @@ package ru.bendricks.piris.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "obligation")
 @Setter
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Obligation {
@@ -50,11 +48,11 @@ public class Obligation {
     private long amount;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_acc_id", referencedColumnName = "id")
+    @JoinColumn(name = "main_acc_id", referencedColumnName = "iban")
     private Account mainAccount;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "percent_acc_id", referencedColumnName = "id")
+    @JoinColumn(name = "percent_acc_id", referencedColumnName = "iban")
     private Account percentAccount;
 
     @ManyToOne

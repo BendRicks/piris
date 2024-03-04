@@ -1,13 +1,12 @@
 package ru.bendricks.piris.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 //public enum AccountType {
 @Entity
@@ -24,5 +23,8 @@ public class AccountType {
 
     @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "accountType")
+    private List<Account> accounts;
 
 }

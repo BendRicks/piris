@@ -21,11 +21,11 @@ public class Transaction {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "iban")
     private Account sender;
 
     @ManyToOne
-    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
+    @JoinColumn(name = "recipient_id", referencedColumnName = "iban")
     private Account recipient;
 
     @Column(name = "amount")

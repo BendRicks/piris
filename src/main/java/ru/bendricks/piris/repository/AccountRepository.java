@@ -5,13 +5,15 @@ import org.springframework.stereotype.Repository;
 import ru.bendricks.piris.model.Account;
 import ru.bendricks.piris.model.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, UUID> {
+public interface AccountRepository extends JpaRepository<Account, String> {
 
     Optional<Account> findByOwner(User user);
-    int countAccountById(UUID id);
+
+    List<Account> findAllByOwnerId(Long id);
 
 }
