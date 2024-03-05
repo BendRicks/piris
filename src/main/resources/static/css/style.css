@@ -2,6 +2,21 @@ p {
     margin: 0;
 }
 
+.main main-dop {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.main-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 90%;
+    margin-left: 10%;
+}
+
 .main {
     display: flex;
     justify-content: center;
@@ -163,4 +178,34 @@ p {
 
 .register-form-header {
     font-size: 30px;
+}
+
+.navigation-bar {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    top: 0px;
+    left: 0px;
+    width: 10%;
+    height: 100%;
+    background: #a1f3f3;
+}
+
+.navigation-bar-element {
+    margin: 15px auto;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+
+}
+
+.disappearing-blocks {
+    width: 100%;
+}
+
+#personal {
+    background: #a1f3f3;
+    border-radius: 20px;
+    width: 90%;
 }
