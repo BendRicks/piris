@@ -72,27 +72,7 @@
 
     <div class="main-page">
         <div id="Personal" class="tabcontent" style="display: block;">
-            <div class="personal-info">
-                <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
-                <p>Дата рождения: ${user.birthDate}</p>
-                <p>Пол: ${user.sex}</p>
-                <p>Идентификационный номер: ${user.passportId}</p>
-                <p>Орган, выдавший документ: ${user.competentOrgan}</p>
-                <p>Дата выдачи: ${user.dateOfIssue}</p>
-                <p>Номер паспорта: ${user.passportSerial}</p>
-                <p>Город проживания: ${user.cityOfResidence}</p>
-                <p>Место рождения: ${user.birthLocation}</p>
-                <p>Адрес проживания: ${user.addressOfLiving}</p>
-                <p>Адрес прописки: ${user.placeOfResidence}</p>
-                <p>Домашний телефон: ${user.homePhoneNumber}</p>
-                <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
-                <p>email: ${user.email}</p>
-                <p>Гражданство: ${user.citizenship}</p>
-                <p>Семейное положение: ${user.maritalStatus}</p>
-                <p>Инвалидность: ${user.disability}</p>
-                <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
-                <p>Ежемесячный доход: ${user.monthlyIncome}</p>
-            </div>
+
         </div>
 
         <div id="Accounts" class="tabcontent">
@@ -115,6 +95,8 @@
             <script>
                 window.onload = async () => {
 
+                    await loadUserInfo()
+
                     document.getElementById("modal-header-cross").addEventListener('click', () => {
                         document.getElementById("modal").style.display = 'none'
                         document.getElementById('modal-content').innerHTML = ''
@@ -126,6 +108,42 @@
                     })
 
                     await getAllUsers();
+                }
+
+                async function loadUserInfo() {
+                    let response = await fetch(`/auth/me`, {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': _csrfToken
+                        }
+                    })
+                    if (response.status == 200) {
+                        let user = await response.json()
+                        document.getElementById('Personal').innerHTML =
+                            `
+                    <div class="personal-info">
+                        <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
+                        <p>Дата рождения: ${user.birthDate}</p>
+                        <p>Пол: ${user.sex}</p>
+                        <p>Идентификационный номер: ${user.passportId}</p>
+                        <p>Орган, выдавший документ: ${user.competentOrgan}</p>
+                        <p>Дата выдачи: ${user.dateOfIssue}</p>
+                        <p>Номер паспорта: ${user.passportSerial}</p>
+                        <p>Город проживания: ${user.cityOfResidence}</p>
+                        <p>Место рождения: ${user.birthLocation}</p>
+                        <p>Адрес проживания: ${user.addressOfLiving}</p>
+                        <p>Адрес прописки: ${user.placeOfResidence}</p>
+                        <p>Домашний телефон: ${user.homePhoneNumber}</p>
+                        <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
+                        <p>email: ${user.email}</p>
+                        <p>Гражданство: ${user.citizenship}</p>
+                        <p>Семейное положение: ${user.maritalStatus}</p>
+                        <p>Инвалидность: ${user.disability}</p>
+                        <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
+                        <p>Ежемесячный доход: ${user.monthlyIncome}</p>
+                    </div>
+                    `
+                    }
                 }
 
                 async function deleteUser(id) {
