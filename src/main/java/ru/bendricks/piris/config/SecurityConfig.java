@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .loginPage("/auth/signin")
                         .loginProcessingUrl("/auth/signin")
-                        .defaultSuccessUrl("/piris/users", true))
+                        .defaultSuccessUrl("/main", true))
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }

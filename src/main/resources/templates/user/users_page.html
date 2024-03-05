@@ -11,8 +11,26 @@
     </script>
 </head>
 <body class="main main-dop">
+<div class="modal-container" id="modal" style="display: none">
+    <div class="modal-background" id="modal-bg"></div>
+    <div class="modal-window">
+        <div class="modal-window-header">
+            <h2 class="modal-window-header-text">Данные пользователя</h2>
+            <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
+                 height="20px" width="20px" version="1.1" id="modal-header-cross" viewBox="0 0 490 490"
+                 xml:space="preserve">
+                        <polygon
+                                points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
+                    </svg>
+        </div>
+        <div class="modal-window-content" id="modal-content">
+
+        </div>
+    </div>
+</div>
     <div class="navigation-bar">
-        <div class="tablinks" id="defaultOpen" onclick="openTab(event, 'Personal')">
+        <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'Personal')">
             <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
             <p>Личная информация</p>
         </div>
@@ -36,7 +54,7 @@
 
     <script>
         function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
+            var i, tabcontent, tablinks, current;
             tabcontent = document.getElementsByClassName("tabcontent");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
@@ -47,45 +65,44 @@
             }
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
+            document.getElementById("tablinks active").style.background = "#79f6f6";
         }
-
-        // Get the element with id="defaultOpen" and click on it
-        document.getElementById("defaultOpen").click();
     </script>
 
-    <div id="Personal" class="tabcontent">
-        <h3>London</h3>
-        <p>London is the capital city of England.</p>
-    </div>
-
-    <div id="Accounts" class="tabcontent">
-        <h3>Paris</h3>
-        <p>Paris is the capital of France.</p>
-    </div>
-
-    <div id="Obligations" class="tabcontent">
-        <h3>Tokyo</h3>
-        <p>Tokyo is the capital of Japan.</p>
-    </div>
 
     <div class="main-page">
-        <div class="modal-container" id="modal" style="display: none">
-            <div class="modal-background" id="modal-bg"></div>
-            <div class="modal-window">
-                <div class="modal-window-header">
-                    <h2 class="modal-window-header-text">Данные пользователя</h2>
-                    <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
-                         xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
-                         height="20px" width="20px" version="1.1" id="modal-header-cross" viewBox="0 0 490 490"
-                         xml:space="preserve">
-                        <polygon
-                                points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
-                    </svg>
-                </div>
-                <div class="modal-window-content" id="modal-content">
-
-                </div>
+        <div id="Personal" class="tabcontent" style="display: block;">
+            <div class="personal-info">
+                <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
+                <p>Дата рождения: ${user.birthDate}</p>
+                <p>Пол: ${user.sex}</p>
+                <p>Идентификационный номер: ${user.passportId}</p>
+                <p>Орган, выдавший документ: ${user.competentOrgan}</p>
+                <p>Дата выдачи: ${user.dateOfIssue}</p>
+                <p>Номер паспорта: ${user.passportSerial}</p>
+                <p>Город проживания: ${user.cityOfResidence}</p>
+                <p>Место рождения: ${user.birthLocation}</p>
+                <p>Адрес проживания: ${user.addressOfLiving}</p>
+                <p>Адрес прописки: ${user.placeOfResidence}</p>
+                <p>Домашний телефон: ${user.homePhoneNumber}</p>
+                <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
+                <p>email: ${user.email}</p>
+                <p>Гражданство: ${user.citizenship}</p>
+                <p>Семейное положение: ${user.maritalStatus}</p>
+                <p>Инвалидность: ${user.disability}</p>
+                <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
+                <p>Ежемесячный доход: ${user.monthlyIncome}</p>
             </div>
+        </div>
+
+        <div id="Accounts" class="tabcontent">
+            <h3>Paris</h3>
+            <p>Paris is the capital of France.</p>
+        </div>
+
+        <div id="Obligations" class="tabcontent">
+            <h3>Tokyo</h3>
+            <p>Tokyo is the capital of Japan.</p>
         </div>
         <!--/*@thymesVar id="user" type="ru.bendricks.piris.model.User"*/-->
         <a href="/auth/signup">Добавить пользователя</a>
@@ -273,7 +290,7 @@
                 }
 
                 async function getUser(id) {
-                    let response = await fetch(`/piris/user/${id}`, {
+                    let response = await fetch(`/users/user/${id}`, {
                         method: 'GET',
                         headers: {
                             'X-CSRF-TOKEN': _csrfToken
@@ -286,7 +303,7 @@
                 }
 
                 async function getAllUsers() {
-                    let response = await fetch('/piris/get_all_users', {
+                    let response = await fetch('/users/get_all_users', {
                         method: 'GET',
                         headers: {
                             'X-CSRF-TOKEN': _csrfToken

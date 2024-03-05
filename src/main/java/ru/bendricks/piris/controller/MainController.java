@@ -17,6 +17,10 @@ public class MainController {
 
     private final UserService userService;
 
+    @GetMapping("/main")
+    public String getUserPage() {
+        return "user/users_page";
+    }
 
 
 }
