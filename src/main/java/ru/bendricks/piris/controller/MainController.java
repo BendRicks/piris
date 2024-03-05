@@ -13,34 +13,10 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/piris")
 public class MainController {
 
     private final UserService userService;
 
-    @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String getUsersPage(Model model) {
-        return "user/users_page";
-    }
 
-    @GetMapping("/get_all_users")
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public List<User> getAllUsers(){
-        List<User> users = userService.getAllUsers();
-        users.forEach(user -> user.setPasswordHash(null));
-        return users;
-    }
-
-    @GetMapping("/user/{id}")
-    @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
-    @ResponseStatus(HttpStatus.OK)
-    public User getUser(@PathVariable(name = "id") long id){
-        User user = userService.getUserById(id);
-        user.setPasswordHash(null);
-        return user;
-    }
 
 }

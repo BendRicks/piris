@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 @Log
 @Service
@@ -76,6 +75,13 @@ public class AccountService {
         return sb.toString();
     }
 
+    public List<Account> getAccountsByUserId(Long id) {
+        return accountRepository.findAllByOwnerId(id);
+    }
+
+    public Account getAccountById(String iban) {
+        return accountRepository.findById(iban).orElse(null);
+    }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -109,8 +115,8 @@ public class AccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<String> getPaymentIbans(Long id) {
-        return accountRepository.findAllByOwnerId(id).stream().map(Account::getIban).toList();
+    public List<Account> getPaymentAccounts(Long id, Currency currency) {
+        return accountRepository.findAllByOwnerIdAndAccountTypeCodeAndCurrency(id, 3014, currency);
     }
 
 }

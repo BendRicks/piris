@@ -2,9 +2,11 @@ package ru.bendricks.piris.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "obligation")
@@ -31,20 +33,22 @@ public class Obligation {
     private RecordStatus status;
 
     @Column(name = "contract_number")
-    @NotBlank
     private String contractNumber;
 
     @Column(name = "creation_time")
-    private LocalDateTime startTime;
+    @NotNull
+    private LocalDate startTime;
 
     @Column(name = "end_time")
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 
     @Column(name = "currency")
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Currency currency;
 
     @Column(name = "amount")
+    @Positive
     private long amount;
 
     @OneToOne(cascade = CascadeType.ALL)

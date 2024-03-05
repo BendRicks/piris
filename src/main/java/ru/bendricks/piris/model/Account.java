@@ -1,6 +1,7 @@
 package ru.bendricks.piris.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class Account {
     private String iban;
 
     @Column(name = "name")
+    @NotBlank
     private String name;
 
 //    @Column(name = "acc_type", nullable = false)
