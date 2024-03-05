@@ -183,7 +183,6 @@ p {
 .navigation-bar {
     position: fixed;
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
     top: 0px;
@@ -193,19 +192,31 @@ p {
     background: #a1f3f3;
 }
 
-.navigation-bar-element {
-    margin: 15px auto;
+.navigation-bar-element, .tablinks{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 auto;
+    padding: 5% 5% 5% 5%;
+    margin-top: 15%;
     font-family: Arial, sans-serif;
     cursor: pointer;
-
 }
 
-.disappearing-blocks {
-    width: 100%;
+.navigation-bar-element:hover, tablinks:hover {
+    background: #79f6f6;
+    border-radius: 15%;
 }
 
-#personal {
-    background: #a1f3f3;
-    border-radius: 20px;
-    width: 90%;
+.navigation-bar tablinks.active{
+    background: #79f6f6;
+    border-radius: 15%;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
 }
