@@ -59,15 +59,9 @@ public class InitConfig {
             obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.DEPOSIT, Currency.BYN, "МТБелки online", 13.2, 36, null));
         }
         if (accountTypeRepository.count() == 0) {
-//            accountTypeRepository.save(new AccountType(3012, "Текущий счёт юридического лица"));
-//            accountTypeRepository.save(new AccountType(3013, "Текущий счёт индивидуального предпринимателя"));
             accountTypeRepository.save(new AccountType(3014, "Текущий счёт физического лица", null));
-//            accountTypeRepository.save(new AccountType(3402, "Депозитный счёт юридического лица"));
-//            accountTypeRepository.save(new AccountType(3403, "Депозитный счёт индивидуального предпринимателя"));
             accountTypeRepository.save(new AccountType(3404, "Депозитный счёт физического лица", null));
             accountTypeRepository.save(new AccountType(3470, "Начисленные процентные расходы по вкладам", null));
-//            accountTypeRepository.save(new AccountType(2300, "Кредитный счёт юридического лица"));
-//            accountTypeRepository.save(new AccountType(2100, "Кредитный счёт индивидуального предпринимателя"));
             accountTypeRepository.save(new AccountType(2400, "Кредитный счёт физического лица", null));
             accountTypeRepository.save(new AccountType(2470, "Начисленные процентные доходы по займам физическим лицам", null));
             accountTypeRepository.save(new AccountType(1010, "Касса банка", null));
@@ -85,6 +79,7 @@ public class InitConfig {
             log.info("Счет СФРБ(EUR) не был найден. Будет создана запись");
             accountRepository.saveAndFlush(new Account(sfrbIBANEur, "Счёт Фонда Развития Банка EUR", accountTypeRepository.getReferenceById(7327), RecordStatus.ACTIVE, adminUser, 100000000L, Currency.EUR, null, null, null));
         }
+        log.info("Курс доллара - " + Currency.USD.getRate());
     }
 
 }

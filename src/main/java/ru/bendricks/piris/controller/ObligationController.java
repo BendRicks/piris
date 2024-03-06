@@ -33,8 +33,8 @@ public class ObligationController {
 
     @PostMapping("/deposit/create")
     @ResponseStatus(HttpStatus.OK)
-    public Obligation createDeposit(@RequestBody @Valid ObligationCreateDTO obligationCreateDTO) {
-        return obligationService.createDepositObligation(obligationCreateDTO);
+    public Obligation createDeposit(@RequestBody @Valid ObligationCreateDTO obligationCreateDTO, @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
+        return obligationService.createDepositObligation(obligationCreateDTO, userDetails);
     }
 
 //    @GetMapping("/deposit/create")

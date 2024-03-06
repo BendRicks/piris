@@ -5,11 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.dto.ObligationCreateDTO;
 import ru.bendricks.piris.model.*;
 import ru.bendricks.piris.repository.ObligationPlanRepository;
 import ru.bendricks.piris.repository.ObligationRepository;
+import ru.bendricks.piris.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,17 +28,21 @@ public class ObligationService {
 
     private final ObligationRepository obligationRepository;
     private final ObligationPlanRepository obligationPlanRepository;
+    private final UserRepository userRepository;
     private final AccountService accountService;
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public Obligation createDepositObligation(ObligationCreateDTO createDTO) {
+    public Obligation createDepositObligation(ObligationCreateDTO createDTO, CustomUserDetails userDetails) throws Exception {
         var obligation = createDTO.getObligation();
         obligation.setContractNumber(generateContractNumber());
         obligation.setEndTime(obligation.getStartTime().plus(createDTO.getMonths(), ChronoUnit.MONTHS));
         var obligationPlan = obligationPlanRepository.getReferenceById(obligation.getObligationPlan().getId());
         obligation.setObligationType(obligationPlan.getObligationType());
         obligation.setAmount(createDTO.getStartBalance());
+        accountService.transferMoney(new Transaction(null, accountService.getAccountById(createDTO.getPaymentIban()),
+                accountService.getSfrbAccount(obligation.getCurrency()).orElse(null), createDTO.getStartBalance(),
+                LocalDateTime.now(), obligation.getCurrency()), userDetails);
         obligation.setCurrency(obligationPlan.getCurrency());
         obligation.setStatus(RecordStatus.ACTIVE);
         accountService.createDepositAccount(obligation);
@@ -68,22 +75,105 @@ public class ObligationService {
     @Transactional
     public void bankDayClose() {
         log.info("Запущена процедура закрытия банковского дня");
+        CustomUserDetails adminUser = new CustomUserDetails(userRepository.findUserByEmail("bank@bank.bank").orElse(null));
         var obligations = obligationRepository.findAll();
         obligations.stream().filter(obligation -> obligation.getStatus().equals(RecordStatus.ACTIVE))
-//                && (obligation.getObligationPlan().getObligationType().equals(ObligationType.DEPOSIT) || obligation.getObligationPlan().getObligationType().equals(ObligationType.DEPOSIT_UNTOUCH)))
                 .forEach(obligation -> {
                     if (checkIfCalcDay(obligation.getStartTime(), obligation.getEndTime())) {
-                        log.info("Происходит расчет процентов для договора " + obligation.getContractNumber());
-                        obligation.getPercentAccount().setBalance(
-                                obligation.getPercentAccount().getBalance() + (long)(obligation.getAmount() *
-                                        obligation.getObligationPlan().getPlanPercent() / 100)
-                        );
-                        obligation.setAmount(obligation.getMainAccount().getBalance());
-                        if (obligation.getEndTime().isEqual(LocalDate.now())) {
-                            obligation.setStatus(RecordStatus.END_OF_SERVICE);
-                            obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
-                            obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                        switch (obligation.getObligationType()) {
+                            case DEPOSIT -> {
+                                log.info("(Депозит) Происходит расчет процентов для договора " + obligation.getContractNumber());
+                                try {
+                                    accountService.transferMoney(
+                                            new Transaction(null, accountService.getSfrbAccount(obligation.getCurrency()).orElse(null),
+                                                    obligation.getPercentAccount(), (long)(obligation.getAmount() * (obligation.getObligationPlan().getPlanPercent() / 1200)),
+                                                    LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (obligation.getEndTime().isEqual(LocalDate.now())) {
+                                    try {
+                                        accountService.transferMoney(
+                                                new Transaction(null, accountService.getSfrbAccount(obligation.getCurrency()).orElse(null),
+                                                        obligation.getMainAccount(), obligation.getAmount(),
+                                                        LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                        obligation.setStatus(RecordStatus.END_OF_SERVICE);
+                                        obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                        obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                } else {
+                                    if (obligation.getMainAccount().getBalance() > 0){
+                                        try {
+                                            obligation.setAmount(obligation.getAmount() + obligation.getMainAccount().getBalance());
+                                            accountService.transferMoney(new Transaction(null, obligation.getMainAccount(),
+                                                    accountService.getSfrbAccount(obligation.getCurrency()).orElse(null), obligation.getMainAccount().getBalance(),
+                                                    LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                }
+                            }
+                            case DEPOSIT_UNTOUCH -> {
+                                if (obligation.getEndTime().isEqual(LocalDate.now())) {
+                                    var finalPercent = (obligation.getObligationPlan().getPlanPercent() / 1200) * ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
+                                    try {
+                                        accountService.transferMoney(
+                                                new Transaction(null, accountService.getSfrbAccount(obligation.getCurrency()).orElse(null),
+                                                        obligation.getMainAccount(), obligation.getAmount(),
+                                                        LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                        accountService.transferMoney(
+                                                new Transaction(null, accountService.getSfrbAccount(obligation.getCurrency()).orElse(null),
+                                                        obligation.getPercentAccount(), (long)(obligation.getAmount() * finalPercent),
+                                                        LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                        obligation.setStatus(RecordStatus.END_OF_SERVICE);
+                                        obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                        obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                            case CREDIT -> {
+
+                            }
+                            case CREDIT_ANUAL -> {
+                                var monthPercent = obligation.getObligationPlan().getPlanPercent() / 1200;
+                                var months = ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
+                                var anuitCoeff = (monthPercent * Math.pow(1 + monthPercent, months)) / (Math.pow(1 + monthPercent, months) - 1);
+                                var monthSum = (long) (obligation.getAmount() * anuitCoeff);
+                                try {
+                                    accountService.transferMoney(new Transaction(null, obligation.getPercentAccount(),
+                                            accountService.getSfrbAccount(obligation.getCurrency()).orElse(null), monthSum,
+                                            LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (obligation.getEndTime().isEqual(LocalDate.now())) {
+                                    obligation.setStatus(RecordStatus.END_OF_SERVICE);
+                                    if (obligation.getMainAccount().getBalance() == 0)
+                                        obligation.getMainAccount().setStatus(RecordStatus.CLOSED);
+                                    else
+                                        obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                    obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                }
+                            }
                         }
+//                        if (.equals(ObligationType.DEPOSIT)) {
+//                            log.info("(Депозит) Происходит расчет процентов для договора " + obligation.getContractNumber());
+//                            obligation.getPercentAccount().setBalance(
+//                                    obligation.getPercentAccount().getBalance() + (long) (obligation.getAmount() *
+//                                            obligation.getObligationPlan().getPlanPercent() / 1200)
+//                            );
+//                            obligation.setAmount(obligation.getMainAccount().getBalance());
+//                        }
+//                        if (obligation.getEndTime().isEqual(LocalDate.now())) {
+//                            obligation.setStatus(RecordStatus.END_OF_SERVICE);
+//                            obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+//                            obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+//                        }
                     }
                 });
     }
@@ -91,7 +181,7 @@ public class ObligationService {
     private boolean checkIfCalcDay(LocalDate startTime, LocalDate endTime) {
         var now = LocalDate.now();
         LocalDate iterator = startTime;
-        while (iterator.isBefore(endTime)){
+        while (iterator.isBefore(endTime)) {
             iterator = iterator.plus(1, ChronoUnit.MONTHS);
             if (iterator.isEqual(now))
                 return true;
@@ -99,7 +189,7 @@ public class ObligationService {
         return false;
     }
 
-    public List<ObligationPlan> getObligationPlansByObligationType(ObligationType ... obligationTypes) {
+    public List<ObligationPlan> getObligationPlansByObligationType(ObligationType... obligationTypes) {
         List<ObligationPlan> plans = new ArrayList<>();
         for (var type : obligationTypes) {
             plans.addAll(obligationPlanRepository.findAllByObligationType(type));
