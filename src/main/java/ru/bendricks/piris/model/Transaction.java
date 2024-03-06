@@ -1,6 +1,7 @@
 package ru.bendricks.piris.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class Transaction {
     private Account recipient;
 
     @Column(name = "amount")
+    @Positive
     private long amount;
 
     @Column(name = "time")

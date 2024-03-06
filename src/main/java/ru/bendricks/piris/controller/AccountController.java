@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.model.Account;
 import ru.bendricks.piris.model.Currency;
+import ru.bendricks.piris.model.RecordStatus;
+import ru.bendricks.piris.model.Transaction;
 import ru.bendricks.piris.service.AccountService;
 
 import java.util.List;
@@ -21,13 +23,19 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    @PostMapping("/transaction/create")
+    @ResponseStatus(HttpStatus.OK)
+    public Transaction createTransaction(@RequestBody @Valid Transaction transaction, @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
+        return accountService.transferMoney(transaction, userDetails);
+    }
+
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
     public Map<String, List<Account>> getCurrentUserAccounts(@AuthenticationPrincipal CustomUserDetails userDetails) {
         var allAccounts = accountService.getAccountsByUserId(userDetails.getId());
-        return Map.of("payment", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3014).toList(),
-                "deposit", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3404 || account.getAccountType().getCode() == 3470).toList(),
-                "credit", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470).toList());
+        return Map.of("payment", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3014 && account.getStatus() == RecordStatus.ACTIVE).toList(),
+                "deposit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 3404 || account.getAccountType().getCode() == 3470) && account.getStatus() != RecordStatus.CLOSED).toList(),
+                "credit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470) && account.getStatus() == RecordStatus.ACTIVE).toList());
     }
 
     @GetMapping("/user/{id}/all")

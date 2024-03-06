@@ -26,7 +26,12 @@
                     </svg>
         </div>
         <div class="modal-window-content" id="modal-content">
-
+            <form id="transactionForm">
+                <input type="button" name="senderAcc">
+                <input type="text" name="recipientAcc">
+                <input type="number" name="amount">
+                <button onclick="transferMoney(event)">Перевести</button>
+            </form>
         </div>
     </div>
 </div>
@@ -220,6 +225,7 @@
                         </div>
                         <div class="panel">
                             <p>Статус: ${recordStatusEnum[depositObl.mainAccount.status]}</p>
+                            ${depositObl.mainAccount.status == 'END_OF_SERVICE' ? '<button onclick="openTransactionModal(' + depositObl.mainAccount.iban + ')">Перевести деньги</button>' : ''}
                         </div>
                         <div class="account-item">
                             <p>IBAN: ${depositObl.percentAccount.iban}</p>
@@ -229,7 +235,7 @@
                         </div>
                         <div class="panel">
                             <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
-                            <button onclick="openUserModal(1)">Перевести деньги</button>
+                            <button onclick="openTransactionModal(${depositObl.percentAccount.iban}})">Перевести деньги</button>
                         </div>
                     </div>
                     `
@@ -297,7 +303,7 @@
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
-                        <button onclick="openUserModal(1)">Перевести деньги</button>
+                        <button onclick="openTransactionModal(${paymAcc.iban})">Перевести деньги</button>
                     </div>
                     `
                 }
@@ -315,7 +321,7 @@
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
-                        ${depositAcc.accountType.code != 3404 ? '<button onclick="openUserModal(1)">Перевести деньги</button>' : ''}
+                        ${depositAcc.accountType.code != 3404 || (depositAcc.accountType.code == 3404 && depositAcc.status == 'END_OF_SERVICE') ? '<button onclick="openTransactionModal(' + depositAcc.iban + ')">Перевести деньги</button>' : ''}
                         <div class="account-item">
                             <p>Номер договора: ${depositAcc.parentObligation.contractNumber}</p>
                             <p>Тип договора: ${obligationTypeEnum[depositAcc.parentObligation.obligationType]}</p>
@@ -342,7 +348,7 @@
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[creditAcc.status]}</p>
-                        ${creditAcc.accountType.code != 2470 ? '<button onclick="openUserModal(1)">Перевести деньги</button>' : ''}
+                        ${creditAcc.accountType.code != 2470 ? '<button onclick="openTransactionModal(' + creditAcc.iban + ')">Перевести деньги</button>' : ''}
                         <div class="account-item">
                             <p>Номер договора: ${creditAcc.parentObligation.contractNumber}</p>
                             <p>Тип договора: ${obligationTypeEnum[creditAcc.parentObligation.obligationType]}</p>
@@ -359,12 +365,38 @@
             }
         }
 
-        async function openUserModal(id) {
-            let user = await getUser(id)
+        async function transferMoney(ev) {
+            ev.preventDefault()
+            let formData = new FormData(document.getElementById('transactionForm'))
+            let transactionData = {
+                sender: {
+                    iban: formData.get('senderAcc')
+                },
+                recipient: {
+                    iban: formData.get('recipient')
+                },
+                amount: Math.floor(Math.valueOf(formData.get('amount'))*100)
+            }
+            let response = await fetch(`/accounts/transaction/create`, {
+                method: 'POST',
+                body: JSON.stringify(transactionData),
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                alert("Транзакция прошла успешно")
+                document.getElementById("modal-header-cross").click()
+            } else {
+                alert(await response.json())
+            }
+        }
+
+        async function openTransactionModal(id) {
             if (user) {
                 let modal = document.getElementById('modal')
-                let container = document.getElementById('modal-content')
-                container.innerHTML = ``
+                let formData = new FormData(document.getElementById('transactionForm'))
+                formData.set('senderAcc', id)
                 modal.style.display = 'block'
             } else {
                 alert("Произошла ошика при загрузке пользователей")

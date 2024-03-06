@@ -16,17 +16,12 @@ import java.util.UUID;
 @Setter
 public class Account {
 
-//    @Id
-//    private UUID id;
-
     @Id
     private String iban;
 
     @Column(name = "name")
-    @NotBlank
     private String name;
 
-//    @Column(name = "acc_type", nullable = false)
     @ManyToOne
     @JoinColumn(name = "acc_type_code", referencedColumnName = "code")
     private AccountType accountType;
