@@ -29,27 +29,36 @@
         </div>
     </div>
 </div>
-    <div class="navigation-bar">
-        <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'Personal')">
-            <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
-            <p>Личная информация</p>
-        </div>
-        <div class="tablinks" onclick="openTab(event, 'Accounts')">
-            <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
-            <p>Счета</p>
-        </div>
-        <div class="tablinks" onclick="openTab(event, 'Obligations')">
-            <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
-            <p>Договоры</p>
-        </div>
-        <div class="navigation-bar-element">
-            <img src="https://cdn-icons-png.flaticon.com/128/584/584072.png" width="60%">
-            <p>ATM</p>
-        </div>
-        <div class="navigation-bar-element">
-            <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
-            <p>Администрирование</p>
-        </div>
+<div class="navigation-bar">
+    <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'AllUsers')">
+        <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
+        <p>Все пользователи</p>
+    </div>
+    <div class="tablinks" onclick="openTab(event, 'Accounts')">
+        <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
+        <p>Счета</p>
+    </div>
+    <div class="tablinks" onclick="openTab(event, 'Obligations')">
+        <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
+        <p>Договоры</p>
+    </div>
+    <div class="navigation-bar-element">
+        <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
+        <p>Администрирование</p>
+    </div>
+</div>
+
+<div class="main-page">
+    <div id="AllUsers" class="tabcontent" style="display: block;">
+
+    </div>
+
+    <div id="Accounts" class="tabcontent">
+
+    </div>
+
+    <div id="Obligations" class="tabcontent">
+
     </div>
 
     <script>
@@ -67,161 +76,80 @@
             evt.currentTarget.className += " active";
             document.getElementById("tablinks active").style.background = "#79f6f6";
         }
-    </script>
 
+        let sexEnum = {
+            MALE: "Мужчина",
+            FEMALE: "Женщина",
+            ATTACK_HELICOPTER: "Атакующий вретолет",
+            CROISSANT: "Круассан"
+        }
+        let maritalStatusEnum = {SINGLE: "Одинок/Одинока", MARRIED: "Женат/Замужем"}
+        let cityOfResidenceEnum = {
+            MINSK: "Минск",
+            BREST: "Брест",
+            GOMEL: "Гомель",
+            GRODNO: "Гродно",
+            VITEBSK: "Витебск",
+            MOGILEV: "Могилёв"
+        }
+        let citizenshipEnum = {
+            REPUBLIC_OF_BELARUS: "Республика Беларусь",
+            REPUBLIC_OF_POLAND: "Rzeczpospolita Polska",
+            RUSSIAN_FEDERATION: "Русня"
+        }
+        let disabilityEnum = {
+            NO: "Нет",
+            FIRST_LEVEL: "Первой степени",
+            SECOND_LEVEL: "Второй степени",
+            THIRD_LEVEL: "Третьей степени"
+        }
+        let recordStatusEnum = {
+            ACTIVE: "Активен",
+            CLOSED: "Закрыт",
+            END_OF_SERVICE: "Окончание действия"
+        }
+        let obligationTypeEnum = {
+            DEPOSIT: "Депозит отзывной",
+            DEPOSIT_UNTOUCH: "Депозит безотзывной",
+            CREDIT: "Кредит",
+            CREDIT_ANUAL: "Кредит анальный"
+        }
 
-    <div class="main-page">
-        <div id="Personal" class="tabcontent" style="display: block;">
+        window.onload = async () => {
 
-        </div>
+            document.getElementById("modal-header-cross").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
 
-        <div id="Accounts" class="tabcontent">
-            <h3>Paris</h3>
-            <p>Paris is the capital of France.</p>
-        </div>
+            document.getElementById("modal-bg").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
 
-        <div id="Obligations" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
-        </div>
-        <a href="/auth/signup">Добавить пользователя</a>
-        <div class="users-items-container" id="users-container">
-            <h2>Пользователи</h2>
-            <script>
-                window.onload = async () => {
+            await getAllUsers();
+        }
 
-                    await loadUserInfo()
-
-                    document.getElementById("modal-header-cross").addEventListener('click', () => {
-                        document.getElementById("modal").style.display = 'none'
-                        document.getElementById('modal-content').innerHTML = ''
-                    })
-
-                    document.getElementById("modal-bg").addEventListener('click', () => {
-                        document.getElementById("modal").style.display = 'none'
-                        document.getElementById('modal-content').innerHTML = ''
-                    })
-
-                    await getAllUsers();
+        async function deleteUser(id) {
+            let response = await fetch(`/auth/user/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
                 }
+            })
+            if (response.status == 200) {
+                document.getElementById(`user_${id}`).remove()
+            }
+            document.getElementById("modal").style.display = 'none'
+            document.getElementById('modal-content').innerHTML = ''
+        }
 
-                async function loadUserInfo() {
-                    let response = await fetch(`/auth/me`, {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        let user = await response.json()
-                        document.getElementById('Personal').innerHTML =
-                            `
-                    <div class="personal-info">
-                        <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
-                        <p>Дата рождения: ${user.birthDate}</p>
-                        <p>Пол: ${user.sex}</p>
-                        <p>Идентификационный номер: ${user.passportId}</p>
-                        <p>Орган, выдавший документ: ${user.competentOrgan}</p>
-                        <p>Дата выдачи: ${user.dateOfIssue}</p>
-                        <p>Номер паспорта: ${user.passportSerial}</p>
-                        <p>Город проживания: ${user.cityOfResidence}</p>
-                        <p>Место рождения: ${user.birthLocation}</p>
-                        <p>Адрес проживания: ${user.addressOfLiving}</p>
-                        <p>Адрес прописки: ${user.placeOfResidence}</p>
-                        <p>Домашний телефон: ${user.homePhoneNumber}</p>
-                        <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
-                        <p>email: ${user.email}</p>
-                        <p>Гражданство: ${user.citizenship}</p>
-                        <p>Семейное положение: ${user.maritalStatus}</p>
-                        <p>Инвалидность: ${user.disability}</p>
-                        <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
-                        <p>Ежемесячный доход: ${user.monthlyIncome}</p>
-                    </div>
-                    `
-                    }
-                }
-
-                async function deleteUser(id) {
-                    let response = await fetch(`/auth/user/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        document.getElementById(`user_${id}`).remove()
-                    }
-                    document.getElementById("modal").style.display = 'none'
-                    document.getElementById('modal-content').innerHTML = ''
-                }
-
-                async function openUserModal(id) {
-                    let user = await getUser(id)
-                    if (user) {
-                        let modal = document.getElementById('modal')
-                        let container = document.getElementById('modal-content')
-                        switch (user.sex) {
-                            case "MALE":
-                                user.sex = "Мужчина"
-                                break
-                            case "FEMALE":
-                                user.sex = "Женщина"
-                                break
-                        }
-                        switch (user.maritalStatus) {
-                            case "SINGLE":
-                                user.maritalStatus = "Одинок/Одинока"
-                                break
-                            case "MARRIED":
-                                user.maritalStatus = "Женат/Замужем"
-                                break
-                        }
-                        switch (user.cityOfResidence) {
-                            case "MINSK":
-                                user.cityOfResidence = "Минск"
-                                break
-                            case "BREST":
-                                user.cityOfResidence = "Брест"
-                                break
-                            case "GOMEL":
-                                user.cityOfResidence = "Гомель"
-                                break
-                            case "GRODNO":
-                                user.cityOfResidence = "Гродно"
-                                break
-                            case "VITEBSK":
-                                user.cityOfResidence = "Витебск"
-                                break
-                            case "MOGILEV":
-                                user.cityOfResidence = "Могилев"
-                                break
-                        }
-                        switch (user.citizenship) {
-                            case "REPUBLIC_OF_BELARUS":
-                                user.citizenship = "Республика Беларусь"
-                                break
-                            case "REPUBLIC_OF_POLAND":
-                                user.citizenship = "Республика Польша"
-                                break
-                            case "RUSSIAN_FEDERATION":
-                                user.citizenship = "Российская Федерация"
-                                break
-                        }
-                        switch (user.disability) {
-                            case "NO":
-                                user.disability = "Отсутствует"
-                                break
-                            case "FIRST_LEVEL":
-                                user.disability = "Первой стадии"
-                                break
-                            case "SECOND_LEVEL":
-                                user.disability = "Второй стадии"
-                                break
-                            case "THIRD_LEVEL":
-                                user.disability = "Третьей стадии"
-                                break
-                        }
-                        container.innerHTML = `
+        async function openUserModal(id) {
+            let user = await getUser(id)
+            if (user) {
+                let modal = document.getElementById('modal')
+                let container = document.getElementById('modal-content')
+                container.innerHTML = `
                         <div class="modal-window-content-row">
             <div class="modal-window-content-row-element">
                 <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
@@ -296,53 +224,52 @@
             <a href="/account/user/${user.id}">Счета</a>
         </div>
                         `
-                        modal.style.display = 'block'
-                    } else {
-                        alert("Произошла ошика при загрузке пользователей")
-                    }
-                }
+                modal.style.display = 'block'
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
 
-                async function getUser(id) {
-                    let response = await fetch(`/users/user/${id}`, {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        return response.json();
-                    }
-                    return null;
+        async function getUser(id) {
+            let response = await fetch(`/users/user/${id}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
                 }
+            })
+            if (response.status == 200) {
+                return response.json();
+            }
+            return null;
+        }
 
-                async function getAllUsers() {
-                    let response = await fetch('/users/get_all_users', {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        let container = document.getElementById('users-container')
-                        let innerHtml = ''
-                        let data = await response.json()
-                        for (const el of data) {
-                            innerHtml += `
+        async function getAllUsers() {
+            let response = await fetch('/users/get_all_users', {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                let container = document.getElementById('AllUsers')
+                let innerHtml = '<h2>Пользователи</h2><hr>'
+                let data = await response.json()
+                for (const el of data) {
+                    innerHtml += `
                                 <div class="user-item" id="user_${el.id}" onclick="openUserModal(${el.id})">
                                     <p>${el.surname} ${el.name} ${el.givenName}</p>
                                     <p>${el.passportId}</p>
                                 </div>
                             `
-                        }
-                        container.innerHTML = innerHtml
-                        // console.log()
-                    } else {
-                        alert("Произошла ошика при загрузке пользователей")
-                    }
                 }
+                container.innerHTML = innerHtml
+                // console.log()
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
 
-            </script>
-        </div>
-    </div>
+    </script>
+</div>
 </body>
 </html>

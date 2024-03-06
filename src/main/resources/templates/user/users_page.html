@@ -43,14 +43,14 @@
         <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
         <p>Договоры</p>
     </div>
-    <div class="navigation-bar-element">
+    <a class="navigation-bar-element">
         <img src="https://cdn-icons-png.flaticon.com/128/584/584072.png" width="60%">
         <p>ATM</p>
-    </div>
-    <div class="navigation-bar-element">
+    </a>
+    <a sec:authorize="hasRole('ADMIN')" style="text-decoration: none" href="/admin" class="navigation-bar-element">
         <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
         <p>Администрирование</p>
-    </div>
+    </a>
 </div>
 
 <div class="main-page">
@@ -138,6 +138,7 @@
 
             await loadUserInfo()
             await getAccounts()
+            await getObligations()
 
             document.getElementById("modal-header-cross").addEventListener('click', () => {
                 document.getElementById("modal").style.display = 'none'
@@ -269,6 +270,7 @@
                     </div>
                     `
                 }
+                document.getElementById('Obligations').innerHTML = innerHtml
             }
         }
 
