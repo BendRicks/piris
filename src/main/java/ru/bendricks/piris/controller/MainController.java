@@ -22,5 +22,9 @@ public class MainController {
         return "user/users_page";
     }
 
+    @GetMapping("/admin")
+    public String getAdminPage() {
+        return "admin/admin_page";
+    }
 
 }
