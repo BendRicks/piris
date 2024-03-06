@@ -80,7 +80,9 @@ public class ObligationService {
                         );
                         obligation.setAmount(obligation.getMainAccount().getBalance());
                         if (obligation.getEndTime().isEqual(LocalDate.now())) {
-                            obligation.setStatus(RecordStatus.CLOSED);
+                            obligation.setStatus(RecordStatus.END_OF_SERVICE);
+                            obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                            obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
                         }
                     }
                 });

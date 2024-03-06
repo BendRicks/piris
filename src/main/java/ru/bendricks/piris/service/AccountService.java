@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.model.*;
 import ru.bendricks.piris.repository.AccountRepository;
 import ru.bendricks.piris.repository.AccountTypeRepository;
@@ -21,7 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AccountService {
 
-//    @Value("${sfrbUUIDByn}")
+    //    @Value("${sfrbUUIDByn}")
 //    private UUID sfrbUUIDByn;
 //    @Value("${sfrbUUIDUsd}")
 //    private UUID sfrbUUIDUsd;
@@ -43,19 +45,36 @@ public class AccountService {
 
     @Transactional
 //    public void transferMoney(UUID senderId, UUID recipientId, long amount) throws Exception {
-    public void transferMoney(String senderId, String recipientId, long amount) throws Exception {
-        Account senderAccount = accountRepository.findById(senderId).orElseThrow(() -> new Exception("Счёт отправителя не был найден"));
-        Account recipientAccount = accountRepository.findById(recipientId).orElseThrow(() -> new Exception("Счёт получателя не был найден"));
-        if (!permittedSenderAccountTypes.contains(senderAccount.getAccountType().getCode()))
+    public Transaction transferMoney(Transaction transaction, CustomUserDetails userDetails) throws Exception {
+        Account senderAccount = accountRepository.findById(transaction.getSender().getIban()).orElseThrow(() -> new Exception("Счёт отправителя не был найден"));
+        Account recipientAccount = accountRepository.findById(transaction.getRecipient().getIban()).orElseThrow(() -> new Exception("Счёт получателя не был найден"));
+        if (senderAccount.getOwner().getId() != userDetails.getId())
+            throw new Exception("Ты хто такой?");
+        if (senderAccount.getStatus() == RecordStatus.CLOSED)
+            throw new Exception("С данного счёта нельзя перевести деньги так как он закрыт");
+        if (!permittedSenderAccountTypes.contains(senderAccount.getAccountType().getCode()) && !(senderAccount.getAccountType().getCode() == 3404 && senderAccount.getStatus() == RecordStatus.END_OF_SERVICE))
             throw new Exception("С данного счёта нельзя перевести деньги");
+        if (recipientAccount.getStatus() == RecordStatus.CLOSED || recipientAccount.getStatus() == RecordStatus.END_OF_SERVICE)
+            throw new Exception("На данный счёт нельзя перевести деньги");
         if (senderAccount.getCurrency() != recipientAccount.getCurrency())
             throw new Exception("Невозможно перевести деньги на счёт с другой валютой");
-        if (senderAccount.getBalance() < amount) {
+        if (senderAccount.getBalance() < transaction.getAmount()) {
             throw new Exception("Недостаточно денег на балансе отправителя");
         }
-        senderAccount.setBalance(senderAccount.getBalance() - amount);
-        recipientAccount.setBalance(recipientAccount.getBalance() + amount);
-        transactionRepository.save(new Transaction(null, senderAccount, recipientAccount, amount, LocalDateTime.now(), senderAccount.getCurrency()));
+        senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+        if (senderAccount.getBalance() == 0 && senderAccount.getStatus() == RecordStatus.END_OF_SERVICE) {
+            senderAccount.setStatus(RecordStatus.CLOSED);
+            if (senderAccount.getParentObligation().getMainAccount().getStatus() == RecordStatus.CLOSED
+                    && senderAccount.getParentObligation().getPercentAccount().getStatus() == RecordStatus.CLOSED) {
+                senderAccount.getParentObligation().setStatus(RecordStatus.CLOSED);
+            }
+        }
+        recipientAccount.setBalance(recipientAccount.getBalance() + transaction.getAmount());
+        transaction.setSender(senderAccount);
+        transaction.setRecipient(recipientAccount);
+        transaction.setTime(LocalDateTime.now());
+        transaction.setCurrency(senderAccount.getCurrency());
+        return transactionRepository.save(transaction);
     }
 
     //BY00MTBK
