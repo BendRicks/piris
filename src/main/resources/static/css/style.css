@@ -200,7 +200,7 @@ p {
     flex-direction: column;
     margin: 0 auto;
     padding: 5% 5% 5% 5%;
-    margin-top: 15%;
+    margin-top: 5vh;
     font-family: Arial, sans-serif;
     cursor: pointer;
 }
@@ -234,4 +234,42 @@ p {
 .personal-info p{
     margin-top: 1vh;
     font-size: 2vh;
+}
+
+.account-item {
+    margin-bottom: 5px;
+    cursor: pointer;
+    width: 90%;
+    margin: 0 auto;
+    background: lightblue;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-around;
+    transition: 0.4s;
+}
+
+.account-item-hidden {
+    background-color: white;
+    display: none;
+    overflow: hidden;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+    background-color: #ccc;
+}
+
+.panel .account-item {
+    background-color: #a6c2e7;
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+    width: 90%;
+    margin: 0 auto;
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
 }
