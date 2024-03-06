@@ -16,6 +16,8 @@ import ru.bendricks.piris.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +139,29 @@ public class ObligationService {
                                 }
                             }
                             case CREDIT -> {
-
+                                var monthsFromStart = ChronoUnit.MONTHS.between(obligation.getStartTime(), LocalDate.now().plus(1, ChronoUnit.DAYS));
+                                var months = ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
+                                long mainDebtMonthPart = (obligation.getAmount() / months);
+                                var q = obligation.getAmount() - (monthsFromStart * mainDebtMonthPart);
+                                var payment =(long) (mainDebtMonthPart + ((q * obligation.getObligationPlan().getPlanPercent() / 100 * YearMonth.now().lengthOfMonth()) / Year.now().length()));
+                                try {
+                                    accountService.transferMoney(new Transaction(null, obligation.getPercentAccount(),
+                                            accountService.getSfrbAccount(obligation.getCurrency()).orElse(null), payment,
+                                            LocalDateTime.now(), obligation.getCurrency()), adminUser);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (obligation.getEndTime().isEqual(LocalDate.now())) {
+                                    obligation.setStatus(RecordStatus.END_OF_SERVICE);
+                                    if (obligation.getMainAccount().getBalance() == 0)
+                                        obligation.getMainAccount().setStatus(RecordStatus.CLOSED);
+                                    else
+                                        obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                    if (obligation.getPercentAccount().getBalance() >= 0)
+                                        obligation.getPercentAccount().setStatus(RecordStatus.CLOSED);
+                                    else
+                                        obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                }
                             }
                             case CREDIT_ANUAL -> {
                                 var monthPercent = obligation.getObligationPlan().getPlanPercent() / 1200;
@@ -157,7 +181,10 @@ public class ObligationService {
                                         obligation.getMainAccount().setStatus(RecordStatus.CLOSED);
                                     else
                                         obligation.getMainAccount().setStatus(RecordStatus.END_OF_SERVICE);
-                                    obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
+                                    if (obligation.getPercentAccount().getBalance() >= 0)
+                                        obligation.getPercentAccount().setStatus(RecordStatus.CLOSED);
+                                    else
+                                        obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
                                 }
                             }
                         }
