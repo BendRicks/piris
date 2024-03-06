@@ -88,13 +88,6 @@
         <div class="users-items-container" id="users-container">
             <h2>Пользователи</h2>
             <script>
-
-                let sexEnum = {MALE: "Мужчина", FEMALE: "Женщина", ATTACK_HELICOPTER: "Атакующий вретолет", CROISSANT: "Круассан"}
-                let maritalStatusEnum = {SINGLE: "Одинок/Одинока", MARRIED: "Женат/Замужем"}
-                let cityOfResidenceEnum = {MINSK: "Минск", BREST: "Брест", GOMEL: "Гомель", GRODNO: "Гродно", VITEBSK: "Витебск", MOGILEV: "Могилёв"}
-                let citizenshipEnum = {REPUBLIC_OF_BELARUS: "Республика Беларусь", REPUBLIC_OF_POLAND: "Rzeczpospolita Polska", RUSSIAN_FEDERATION: "Русня"}
-                let disabilityEnum = {NO: "Нет", FIRST_LEVEL: "Первой степени", SECOND_LEVEL: "Второй степени", THIRD_LEVEL: "Третьей степени"}
-
                 window.onload = async () => {
 
                     await loadUserInfo()
@@ -126,21 +119,21 @@
                     <div class="personal-info">
                         <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
                         <p>Дата рождения: ${user.birthDate}</p>
-                        <p>Пол: ${sexEnum[user.sex]}</p>
+                        <p>Пол: ${user.sex}</p>
                         <p>Идентификационный номер: ${user.passportId}</p>
                         <p>Орган, выдавший документ: ${user.competentOrgan}</p>
                         <p>Дата выдачи: ${user.dateOfIssue}</p>
                         <p>Номер паспорта: ${user.passportSerial}</p>
-                        <p>Город проживания: ${cityOfResidenceEnum[user.cityOfResidence]}</p>
+                        <p>Город проживания: ${user.cityOfResidence}</p>
                         <p>Место рождения: ${user.birthLocation}</p>
                         <p>Адрес проживания: ${user.addressOfLiving}</p>
                         <p>Адрес прописки: ${user.placeOfResidence}</p>
                         <p>Домашний телефон: ${user.homePhoneNumber}</p>
                         <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
                         <p>email: ${user.email}</p>
-                        <p>Гражданство: ${citizenshipEnum[user.citizenship]}</p>
-                        <p>Семейное положение: ${maritalStatusEnum[user.maritalStatus]}</p>
-                        <p>Инвалидность: ${disabilityEnum[user.disability]}</p>
+                        <p>Гражданство: ${user.citizenship}</p>
+                        <p>Семейное положение: ${user.maritalStatus}</p>
+                        <p>Инвалидность: ${user.disability}</p>
                         <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
                         <p>Ежемесячный доход: ${user.monthlyIncome}</p>
                     </div>
@@ -148,12 +141,161 @@
                     }
                 }
 
+                async function deleteUser(id) {
+                    let response = await fetch(`/auth/user/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': _csrfToken
+                        }
+                    })
+                    if (response.status == 200) {
+                        document.getElementById(`user_${id}`).remove()
+                    }
+                    document.getElementById("modal").style.display = 'none'
+                    document.getElementById('modal-content').innerHTML = ''
+                }
+
                 async function openUserModal(id) {
                     let user = await getUser(id)
                     if (user) {
                         let modal = document.getElementById('modal')
                         let container = document.getElementById('modal-content')
-                        container.innerHTML = ``
+                        switch (user.sex) {
+                            case "MALE":
+                                user.sex = "Мужчина"
+                                break
+                            case "FEMALE":
+                                user.sex = "Женщина"
+                                break
+                        }
+                        switch (user.maritalStatus) {
+                            case "SINGLE":
+                                user.maritalStatus = "Одинок/Одинока"
+                                break
+                            case "MARRIED":
+                                user.maritalStatus = "Женат/Замужем"
+                                break
+                        }
+                        switch (user.cityOfResidence) {
+                            case "MINSK":
+                                user.cityOfResidence = "Минск"
+                                break
+                            case "BREST":
+                                user.cityOfResidence = "Брест"
+                                break
+                            case "GOMEL":
+                                user.cityOfResidence = "Гомель"
+                                break
+                            case "GRODNO":
+                                user.cityOfResidence = "Гродно"
+                                break
+                            case "VITEBSK":
+                                user.cityOfResidence = "Витебск"
+                                break
+                            case "MOGILEV":
+                                user.cityOfResidence = "Могилев"
+                                break
+                        }
+                        switch (user.citizenship) {
+                            case "REPUBLIC_OF_BELARUS":
+                                user.citizenship = "Республика Беларусь"
+                                break
+                            case "REPUBLIC_OF_POLAND":
+                                user.citizenship = "Республика Польша"
+                                break
+                            case "RUSSIAN_FEDERATION":
+                                user.citizenship = "Российская Федерация"
+                                break
+                        }
+                        switch (user.disability) {
+                            case "NO":
+                                user.disability = "Отсутствует"
+                                break
+                            case "FIRST_LEVEL":
+                                user.disability = "Первой стадии"
+                                break
+                            case "SECOND_LEVEL":
+                                user.disability = "Второй стадии"
+                                break
+                            case "THIRD_LEVEL":
+                                user.disability = "Третьей стадии"
+                                break
+                        }
+                        container.innerHTML = `
+                        <div class="modal-window-content-row">
+            <div class="modal-window-content-row-element">
+                <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Дата рождения: ${user.birthDate}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Пол: ${user.sex}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Идентификационный номер: ${user.passportId}</p>
+            </div>
+        </div>
+        <div class="modal-window-content-row">
+            <div class="modal-window-content-row-element">
+                <p>Орган, выдавший документ: ${user.competentOrgan}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Дата выдачи: ${user.dateOfIssue}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Номер паспорта: ${user.passportSerial}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Город проживания: ${user.cityOfResidence}</p>
+            </div>
+        </div>
+        <div class="modal-window-content-row">
+            <div class="modal-window-content-row-element">
+                <p>Место рождения: ${user.birthLocation}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Адрес проживания: ${user.addressOfLiving}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Адрес прописки: ${user.placeOfResidence}</p>
+            </div>
+        </div>
+        <div class="modal-window-content-row">
+            <div class="modal-window-content-row-element">
+                <p>Домашний телефон: ${user.homePhoneNumber}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>email: ${user.email}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Гражданство: ${user.citizenship}</p>
+            </div>
+        </div>
+        <div class="modal-window-content-row">
+            <div class="modal-window-content-row-element">
+                <p>Семейное положение: ${user.maritalStatus}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Инвалидность: ${user.disability}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
+            </div>
+            <div class="modal-window-content-row-element">
+                <p>Ежемесячный доход: ${user.monthlyIncome}</p>
+            </div>
+        </div>
+        <div class="modal-window-content-row">
+            <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
+            <a href="/auth/edit/${user.id}">Изменить</a>
+            <a href="/obligation/user/${user.id}">Договоры</a>
+            <a href="/account/user/${user.id}">Счета</a>
+        </div>
+                        `
                         modal.style.display = 'block'
                     } else {
                         alert("Произошла ошика при загрузке пользователей")

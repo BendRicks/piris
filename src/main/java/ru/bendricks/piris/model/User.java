@@ -1,5 +1,6 @@
 package ru.bendricks.piris.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -122,9 +123,11 @@ public class User {
     private long monthlyIncome;
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Account> accounts;
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Obligation> obligations;
 
 }
