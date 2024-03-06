@@ -27,9 +27,18 @@
         </div>
         <div class="modal-window-content" id="modal-content">
             <form id="transactionForm">
-                <input type="button" name="senderAcc">
-                <input type="text" name="recipientAcc">
-                <input type="number" name="amount">
+                <label class="input-label">
+                    Источник
+                    <input type="text" readonly id="senderAcc" name="senderAcc">
+                </label>
+                <label class="input-label">
+                    Адресат
+                    <input type="text" id="recipientAcc" name="recipientAcc">
+                </label>
+                <label class="input-label">
+                    Сумма
+                    <input type="number" id="amount" name="amount">
+                </label>
                 <button onclick="transferMoney(event)">Перевести</button>
             </form>
         </div>
@@ -56,6 +65,10 @@
         <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
         <p>Администрирование</p>
     </a>
+    <form action="/auth/logout" method="post" class="navigation-bar-element">
+        <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+        <input type="submit" value="Выйти">
+    </form>
 </div>
 
 <div class="main-page">
@@ -86,19 +99,21 @@
             document.getElementById("tablinks active").style.background = "#79f6f6";
         }
 
-        let acc = document.getElementsByClassName("account-item");
-        let i;
+        async function configureAccordeons() {
+            let acc = document.getElementsByClassName("account-item");
+            let i;
 
-        for (i = 0; i < acc.length; i++) {
-            acc[i].addEventListener("click", function () {
-                this.classList.toggle("active");
-                let panel = this.nextElementSibling;
-                if (panel.style.display === "block") {
-                    panel.style.display = "none";
-                } else {
-                    panel.style.display = "block";
-                }
-            });
+            for (i = 0; i < acc.length; i++) {
+                acc[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    let panel = this.nextElementSibling;
+                    if (panel.style && panel.style.display && panel.style.display === "block") {
+                        panel.style.display = "none";
+                    } else {
+                        panel.style.display = "block";
+                    }
+                });
+            }
         }
 
         let sexEnum = {
@@ -147,12 +162,12 @@
 
             document.getElementById("modal-header-cross").addEventListener('click', () => {
                 document.getElementById("modal").style.display = 'none'
-                document.getElementById('modal-content').innerHTML = ''
+                // document.getElementById('modal-content').innerHTML = ''
             })
 
             document.getElementById("modal-bg").addEventListener('click', () => {
                 document.getElementById("modal").style.display = 'none'
-                document.getElementById('modal-content').innerHTML = ''
+                // document.getElementById('modal-content').innerHTML = ''
             })
 
         }
@@ -217,23 +232,23 @@
                         <p>Депозитный план: ${depositObl.obligationPlan.name} ${depositObl.obligationPlan.planPercent}% ${depositObl.obligationPlan.currency} до ${depositObl.obligationPlan.months} месяцев</p>
                         <p>Сумма вклада: ${depositObl.amount / 100} ${depositObl.currency}</p>
                         <div class="account-item">
-                            <p>IBAN: ${depositObl.mainAccount.iban}</p>
-                            <p>имя: ${depositObl.mainAccount.name}</p>
-                            <p>тип: ${depositObl.mainAccount.accountType.description}</p>
-                            <p>баланс: ${depositObl.mainAccount.balance / 100} ${depositObl.mainAccount.currency}</p>
+                            <p>Имя: ${depositObl.mainAccount.name}</p>
+                            <p>Тип: ${depositObl.mainAccount.accountType.description}</p>
+                            <p>Баланс: ${depositObl.mainAccount.balance / 100} ${depositObl.mainAccount.currency}</p>
                         </div>
                         <div class="panel">
                             <p>Статус: ${recordStatusEnum[depositObl.mainAccount.status]}</p>
+                            <p>IBAN: ${depositObl.mainAccount.iban}</p>
                             ${depositObl.mainAccount.status == 'END_OF_SERVICE' ? '<button onclick="openTransactionModal(' + depositObl.mainAccount.iban + ')">Перевести деньги</button>' : ''}
                         </div>
                         <div class="account-item">
-                            <p>IBAN: ${depositObl.percentAccount.iban}</p>
-                            <p>имя: ${depositObl.percentAccount.name}</p>
-                            <p>тип: ${depositObl.percentAccount.accountType.description}</p>
-                            <p>баланс: ${depositObl.percentAccount.balance / 100} ${depositObl.percentAccount.currency}</p>
+                            <p>Имя: ${depositObl.percentAccount.name}</p>
+                            <p>Тип: ${depositObl.percentAccount.accountType.description}</p>
+                            <p>Баланс: ${depositObl.percentAccount.balance / 100} ${depositObl.percentAccount.currency}</p>
                         </div>
                         <div class="panel">
                             <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
+                            <p>IBAN: ${depositObl.percentAccount.iban}</p>
                             <button onclick="openTransactionModal(${depositObl.percentAccount.iban}})">Перевести деньги</button>
                         </div>
                     </div>
@@ -254,28 +269,29 @@
                         <p>Депозитный план: ${creditObl.obligationPlan.name} ${creditObl.obligationPlan.planPercent}% ${creditObl.obligationPlan.currency} до ${creditObl.obligationPlan.months} месяцев</p>
                         <p>Сумма вклада: ${creditObl.amount / 100} ${creditObl.currency}</p>
                         <div class="account-item">
-                            <p>IBAN: ${creditObl.mainAccount.iban}</p>
-                            <p>имя: ${creditObl.mainAccount.name}</p>
-                            <p>тип: ${creditObl.mainAccount.accountType.description}</p>
-                            <p>баланс: ${creditObl.mainAccount.balance / 100} ${creditObl.mainAccount.currency}</p>
+                            <p>Имя: ${creditObl.mainAccount.name}</p>
+                            <p>Тип: ${creditObl.mainAccount.accountType.description}</p>
+                            <p>Баланс: ${creditObl.mainAccount.balance / 100} ${creditObl.mainAccount.currency}</p>
                         </div>
                         <div class="panel">
                             <p>Статус: ${recordStatusEnum[creditObl.mainAccount.status]}</p>
+                            <p>IBAN: ${creditObl.mainAccount.iban}</p>
                             <button onclick="openUserModal(1)">Перевести деньги</button>
                         </div>
                         <div class="account-item">
-                            <p>IBAN: ${creditObl.percentAccount.iban}</p>
-                            <p>имя: ${creditObl.percentAccount.name}</p>
-                            <p>тип: ${creditObl.percentAccount.accountType.description}</p>
-                            <p>баланс: ${creditObl.percentAccount.balance / 100} ${creditObl.percentAccount.currency}</p>
+                            <p>Имя: ${creditObl.percentAccount.name}</p>
+                            <p>Тип: ${creditObl.percentAccount.accountType.description}</p>
+                            <p>Баланс: ${creditObl.percentAccount.balance / 100} ${creditObl.percentAccount.currency}</p>
                         </div>
                         <div class="panel">
-                            <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
+                            <p>Статус: ${recordStatusEnum[creditObl.percentAccount.status]}</p>
+                            <p>IBAN: ${creditObl.percentAccount.iban}</p>
                         </div>
                     </div>
                     `
                 }
                 document.getElementById('Obligations').innerHTML = innerHtml
+                await configureAccordeons()
             }
         }
 
@@ -295,14 +311,14 @@
                 for (const paymAcc of accounts.payment) {
                     innerHtml += `
                     <div class="account-item">
-                        <p>IBAN: ${paymAcc.iban}</p>
-                        <p>имя: ${paymAcc.name}</p>
-                        <p>тип: ${paymAcc.accountType.description}</p>
-                        <p>баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
+                        <p>Имя: ${paymAcc.name}</p>
+                        <p>Тип: ${paymAcc.accountType.description}</p>
+                        <p>Баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
-                        <button onclick="openTransactionModal(${paymAcc.iban})">Перевести деньги</button>
+                        <p>IBAN: ${paymAcc.iban}</p>
+                        <button onclick="openTransactionModal('${paymAcc.iban}')">Перевести деньги</button>
                     </div>
                     `
                 }
@@ -313,23 +329,14 @@
                 for (const depositAcc of accounts.deposit) {
                     innerHtml += `
                     <div class="account-item">
-                        <p>IBAN: ${depositAcc.iban}</p>
-                        <p>имя: ${depositAcc.name}</p>
-                        <p>тип: ${depositAcc.accountType.description}</p>
-                        <p>баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
+                        <p>Имя: ${depositAcc.name}</p>
+                        <p>Тип: ${depositAcc.accountType.description}</p>
+                        <p>Баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
-                        ${depositAcc.accountType.code != 3404 || (depositAcc.accountType.code == 3404 && depositAcc.status == 'END_OF_SERVICE') ? '<button onclick="openTransactionModal(' + depositAcc.iban + ')">Перевести деньги</button>' : ''}
-                        <div class="account-item">
-                            <p>Номер договора: ${depositAcc.parentObligation.contractNumber}</p>
-                            <p>Тип договора: ${obligationTypeEnum[depositAcc.parentObligation.obligationType]}</p>
-                            <p>Валюта: ${depositAcc.parentObligation.currency}</p>
-                        </div>
-                        <div class="panel">
-                            <p>Депозитный план: ${depositAcc.parentObligation.obligationPlan.name} ${depositAcc.parentObligation.obligationPlan.planPercent}% ${depositAcc.parentObligation.obligationPlan.currency} до ${depositAcc.parentObligation.obligationPlan.months} месяцев</p>
-                            <p>Сумма вклада: ${depositAcc.parentObligation.amount / 100} ${depositAcc.parentObligation.currency}</p>
-                        </div>
+                        <p>IBAN: ${depositAcc.iban}</p>
+                        ${depositAcc.accountType.code != 3404 || (depositAcc.accountType.code == 3404 && depositAcc.status == 'END_OF_SERVICE') ? '<button onclick="openTransactionModal(\'' + depositAcc.iban + '\')">Перевести деньги</button>' : ''}
                     </div>
                     `
                 }
@@ -340,26 +347,18 @@
                 for (const creditAcc of accounts.credit) {
                     innerHtml += `
                     <div class="account-item">
-                        <p>IBAN: ${creditAcc.iban}</p>
-                        <p>имя: ${creditAcc.name}</p>
-                        <p>тип: ${creditAcc.accountType.description}</p>
-                        <p>баланс: ${creditAcc.balance / 100} ${creditAcc.currency}</p>
+                        <p>Имя: ${creditAcc.name}</p>
+                        <p>Тип: ${creditAcc.accountType.description}</p>
+                        <p>Баланс: ${creditAcc.balance / 100} ${creditAcc.currency}</p>
                     </div>
                     <div class="panel">
                         <p>Статус: ${recordStatusEnum[creditAcc.status]}</p>
-                        ${creditAcc.accountType.code != 2470 ? '<button onclick="openTransactionModal(' + creditAcc.iban + ')">Перевести деньги</button>' : ''}
-                        <div class="account-item">
-                            <p>Номер договора: ${creditAcc.parentObligation.contractNumber}</p>
-                            <p>Тип договора: ${obligationTypeEnum[creditAcc.parentObligation.obligationType]}</p>
-                            <p>Валюта: ${creditAcc.parentObligation.currency}</p>
-                        </div>
-                        <div class="panel">
-                            <p>Кредитный план: ${creditAcc.parentObligation.obligationPlan.name} ${creditAcc.parentObligation.obligationPlan.planPercent}% ${creditAcc.parentObligation.obligationPlan.currency} до ${creditAcc.parentObligation.obligationPlan.months} месяцев</p>
-                            <p>Сумма кредита: ${creditAcc.parentObligation.amount / 100} ${creditAcc.parentObligation.currency}</p>
-                        </div>
+                        <p>IBAN: ${creditAcc.iban}</p>
+                        ${creditAcc.accountType.code != 2470 ? '<button onclick="openTransactionModal(\'' + creditAcc.iban + '\')">Перевести деньги</button>' : ''}
                     </div>
                     `
                 }
+                await configureAccordeons()
                 document.getElementById('Accounts').innerHTML = innerHtml
             }
         }
@@ -372,34 +371,30 @@
                     iban: formData.get('senderAcc')
                 },
                 recipient: {
-                    iban: formData.get('recipient')
+                    iban: formData.get('recipientAcc')
                 },
-                amount: Math.floor(Math.valueOf(formData.get('amount'))*100)
+                amount: formData.get('amount') * 100
             }
             let response = await fetch(`/accounts/transaction/create`, {
                 method: 'POST',
                 body: JSON.stringify(transactionData),
                 headers: {
+                    'content-type': 'application/json',
                     'X-CSRF-TOKEN': _csrfToken
                 }
             })
             if (response.status == 200) {
                 alert("Транзакция прошла успешно")
-                document.getElementById("modal-header-cross").click()
+                document.getElementById("modal").style.display = 'none'
             } else {
                 alert(await response.json())
             }
         }
 
         async function openTransactionModal(id) {
-            if (user) {
-                let modal = document.getElementById('modal')
-                let formData = new FormData(document.getElementById('transactionForm'))
-                formData.set('senderAcc', id)
-                modal.style.display = 'block'
-            } else {
-                alert("Произошла ошика при загрузке пользователей")
-            }
+            let modal = document.getElementById('modal')
+            document.getElementById('senderAcc').value = id
+            modal.style.display = 'block'
         }
 
     </script>

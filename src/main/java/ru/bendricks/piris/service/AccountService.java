@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import ru.bendricks.piris.config.CustomUserDetails;
@@ -67,17 +66,19 @@ public class AccountService {
         senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
         if (senderAccount.getBalance() == 0 && senderAccount.getStatus() == RecordStatus.END_OF_SERVICE) {
             senderAccount.setStatus(RecordStatus.CLOSED);
-            if (senderAccount.getParentObligation().getMainAccount().getStatus() == RecordStatus.CLOSED
-                    && senderAccount.getParentObligation().getPercentAccount().getStatus() == RecordStatus.CLOSED) {
-                senderAccount.getParentObligation().setStatus(RecordStatus.CLOSED);
+            var parentObligation = Optional.of(senderAccount.getParentObligationAsMainAccount()).orElse(senderAccount.getParentObligationAsPercentAccount());
+            if (parentObligation.getMainAccount().getStatus() == RecordStatus.CLOSED
+                    && parentObligation.getPercentAccount().getStatus() == RecordStatus.CLOSED) {
+                parentObligation.setStatus(RecordStatus.CLOSED);
             }
         }
         recipientAccount.setBalance(recipientAccount.getBalance() + transaction.getAmount());
         if (recipientAccount.getBalance() >= 0 && recipientAccount.getStatus() == RecordStatus.END_OF_SERVICE) {
             recipientAccount.setStatus(RecordStatus.CLOSED);
-            if (recipientAccount.getParentObligation().getMainAccount().getStatus() == RecordStatus.CLOSED
-                    && recipientAccount.getParentObligation().getPercentAccount().getStatus() == RecordStatus.CLOSED) {
-                recipientAccount.getParentObligation().setStatus(RecordStatus.CLOSED);
+            var parentObligation = Optional.of(senderAccount.getParentObligationAsMainAccount()).orElse(senderAccount.getParentObligationAsPercentAccount());
+            if (parentObligation.getMainAccount().getStatus() == RecordStatus.CLOSED
+                    && parentObligation.getPercentAccount().getStatus() == RecordStatus.CLOSED) {
+                parentObligation.setStatus(RecordStatus.CLOSED);
             }
         }
         transaction.setSender(senderAccount);
@@ -112,17 +113,30 @@ public class AccountService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void createDepositAccount(Obligation obligation) {
+    public void createDepositAccounts(Obligation obligation) {
         var mainIban = generateIban();
         var percentIban = generateIban();
-        var mainAccount = new Account(mainIban, "Депозитный счёт", accountTypeRepository.getReferenceById(3404),
-                RecordStatus.ACTIVE, obligation.getOwner(), obligation.getAmount(), obligation.getCurrency(), obligation,
-                null, null);
+        var mainAccount = new Account(mainIban, "Депозитный счёт", accountTypeRepository.findById(3404).orElse(null),
+                RecordStatus.ACTIVE, obligation.getOwner(), 0, obligation.getCurrency(), obligation,
+                null, null, null);
         var percentAccount = new Account(percentIban, "Процентный счёт по депозиту " + mainIban,
-                accountTypeRepository.getReferenceById(3470), RecordStatus.ACTIVE, obligation.getOwner(),
-                0, obligation.getCurrency(), obligation, null, null);
-        var sfrbAcc = getSfrbAccount(obligation.getCurrency());
-        sfrbAcc.ifPresent(sfAcc -> sfAcc.setBalance(sfAcc.getBalance() + obligation.getAmount()));
+                accountTypeRepository.findById(3470).orElse(null), RecordStatus.ACTIVE, obligation.getOwner(),
+                0, obligation.getCurrency(), null, obligation, null, null);
+        obligation.setMainAccount(mainAccount);
+        obligation.setPercentAccount(percentAccount);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void createCreditAccounts(Obligation obligation) {
+        var mainIban = generateIban();
+        var percentIban = generateIban();
+        var mainAccount = new Account(mainIban, "Кредитный счёт", accountTypeRepository.findById(2400).orElse(null),
+                RecordStatus.ACTIVE, obligation.getOwner(), 0, obligation.getCurrency(), obligation,
+                null, null, null);
+        var percentAccount = new Account(percentIban, "Процентный счёт по кредиту " + mainIban,
+                accountTypeRepository.findById(2470).orElse(null), RecordStatus.ACTIVE, obligation.getOwner(),
+                0, obligation.getCurrency(), null, obligation, null, null);
         obligation.setMainAccount(mainAccount);
         obligation.setPercentAccount(percentAccount);
     }
@@ -140,7 +154,7 @@ public class AccountService {
     @PreAuthorize("hasRole('ADMIN')")
     public Account createPaymentAccount(Account account) {
         account.setIban(generateIban());
-        account.setAccountType(accountTypeRepository.getReferenceById(3014));
+        account.setAccountType(accountTypeRepository.findById(3014).orElse(null));
         account.setBalance(0);
         account.setStatus(RecordStatus.ACTIVE);
         return accountRepository.save(account);

@@ -1,5 +1,7 @@
 package ru.bendricks.piris.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +27,7 @@ public class AccountType {
     private String description;
 
     @OneToMany(mappedBy = "accountType")
+    @JsonIgnore
     private List<Account> accounts;
 
 }

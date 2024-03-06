@@ -1,5 +1,7 @@
 package ru.bendricks.piris.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,6 +43,7 @@ public class ObligationPlan {
     private int months;
 
     @OneToMany(mappedBy = "obligationPlan")
+    @JsonIgnore
     List<Obligation> obligations;
 
 }

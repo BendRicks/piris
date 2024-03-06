@@ -3,6 +3,7 @@ package ru.bendricks.piris.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/transaction/create")
+    @PostMapping(value = "/transaction/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Transaction createTransaction(@RequestBody @Valid Transaction transaction, @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
         return accountService.transferMoney(transaction, userDetails);
@@ -33,16 +34,19 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, List<Account>> getCurrentUserAccounts(@AuthenticationPrincipal CustomUserDetails userDetails) {
         var allAccounts = accountService.getAccountsByUserId(userDetails.getId());
-        return Map.of("payment", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3014 && account.getStatus() == RecordStatus.ACTIVE).toList(),
+        return Map.of("payment", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 3014 || account.getAccountType().getCode() == 7327) && account.getStatus() != RecordStatus.CLOSED).toList(),
                 "deposit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 3404 || account.getAccountType().getCode() == 3470) && account.getStatus() != RecordStatus.CLOSED).toList(),
-                "credit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470) && account.getStatus() == RecordStatus.ACTIVE).toList());
+                "credit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470) && account.getStatus() != RecordStatus.CLOSED).toList());
     }
 
     @GetMapping("/user/{id}/all")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public List<Account> getUserAccounts(@PathVariable(name = "id") Long userId) {
-        return accountService.getAccountsByUserId(userId);
+    public Map<String, List<Account>> getUserAccounts(@PathVariable(name = "id") Long userId) {
+        var allAccounts = accountService.getAccountsByUserId(userId);
+        return Map.of("payment", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3014 && account.getStatus() != RecordStatus.CLOSED).toList(),
+                "deposit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 3404 || account.getAccountType().getCode() == 3470) && account.getStatus() != RecordStatus.CLOSED).toList(),
+                "credit", allAccounts.stream().filter(account -> (account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470) && account.getStatus() != RecordStatus.CLOSED).toList());
     }
 
     @GetMapping("/{id}")

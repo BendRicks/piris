@@ -1,6 +1,8 @@
 package ru.bendricks.piris.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -89,11 +91,11 @@ public class User {
     private String addressOfLiving;
 
     @Column(name = "home_phone_number")
-    @Pattern(regexp = "(\\d{7})?", message = "Должен состоять из 7 цифр 1234567")
+    @Pattern(regexp = "(\\+37517\\d{7})?", message = "Должен состоять из 12 цифр +375171111111")
     private String homePhoneNumber;
 
     @Column(name = "mobile_phone_number", unique = true)
-    @Pattern(regexp = "(\\d{9})?", message = "Должен состоять из 9 цифр 123456789, где первые 2 - код (25, 29, 33, 44)")
+    @Pattern(regexp = "(\\+375\\d{9})?", message = "Должен состоять из 12 цифр +375292222222")
     private String mobilePhoneNumber;
 
     @Column(name = "email", nullable = false, unique = true)

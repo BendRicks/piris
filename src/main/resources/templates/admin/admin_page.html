@@ -40,40 +40,12 @@
             <div id="adminPersonal" class="admin-tab-content" style="display: block;">
 
             </div>
-
             <div id="adminAccounts" class="admin-tab-content">
-                <div class="account-item">
-                    <p>IBAN: ${paymAcc.iban}</p>
-                    <p>имя: ${paymAcc.name}</p>
-                    <p>тип: ${paymAcc.accountType.description}</p>
-                    <p>баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
-                </div>
-                <div class="panel">
-                    <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
-                </div>
 
-                <button value="Создать" onclick="createCount()">Создать счет</button>
             </div>
 
             <div id="adminObligations" class="admin-tab-content">
-                <div class="account-item">
-                    <p>IBAN: ${depositAcc.iban}</p>
-                    <p>имя: ${depositAcc.name}</p>
-                    <p>тип: ${depositAcc.accountType.description}</p>
-                    <p>баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
-                </div>
-                <div class="panel">
-                    <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
-                    <div class="account-item">
-                        <p>Номер договора: ${depositAcc.parentObligation.contractNumber}</p>
-                        <p>Тип договора: ${obligationTypeEnum[depositAcc.parentObligation.obligationType]}</p>
-                        <p>Валюта: ${depositAcc.parentObligation.currency}</p>
-                    </div>
-                    <div class="panel">
-                        <p>Депозитный план: ${depositAcc.parentObligation.obligationPlan.name} ${depositAcc.parentObligation.obligationPlan.planPercent}% ${depositAcc.parentObligation.obligationPlan.currency} до ${depositAcc.parentObligation.obligationPlan.months} месяцев</p>
-                        <p>Сумма вклада: ${depositAcc.parentObligation.amount / 100} ${depositAcc.parentObligation.currency}</p>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -157,12 +129,12 @@
                             <input required type="text" class="text-input" name="addressOfLiving" id="addressOfLiving">
                         </label>
                         <label class="input-label">
-                            Домашний телефон
-                            <input type="text" class="text-input" name="homePhoneNumber" id="homePhoneNumber" pattern="\d{7}">
+                            Домашний телефон (+37517...)
+                            <input type="text" class="text-input" name="homePhoneNumber" id="homePhoneNumber" pattern="+37517\d{7}">
                         </label>
                         <label class="input-label">
-                            Мобильный телефон
-                            <input type="text" class="text-input" name="mobilePhoneNumber" id="mobilePhoneNumber" pattern="\d{9}">
+                            Мобильный телефон (+37529...)
+                            <input type="text" class="text-input" name="mobilePhoneNumber" id="mobilePhoneNumber" pattern="+375\d{9}">
                         </label>
                         <label class="input-label">
                             Адрес прописки
@@ -196,34 +168,34 @@
                         </label>
                     </div>
                 </div>
-                <button class="send-button" onclick="createNewUser(event)" value="Sign Up"/>
+                <button class="send-button" onclick="createNewUser(event)">Создать</button>
             </form>
         </div>
     </div>
 </div>
 
-<div class="modal-container" id="count-modal" style="display: block">
-    <div class="modal-background" id="count-modal-bg"></div>
+<div class="modal-container" id="account-modal" style="display: none">
+    <div class="modal-background" id="account-modal-bg"></div>
     <div class="modal-window">
         <div class="modal-window-header">
             <p>Создать счет</p>
             <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
-                 height="20px" width="20px" version="1.1" id="count-modal-header-cross" viewBox="0 0 490 490"
+                 height="20px" width="20px" version="1.1" id="account-modal-header-cross" viewBox="0 0 490 490"
                  xml:space="preserve">
                         <polygon
                                 points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
                     </svg>
         </div>
-        <div class="modal-window-content" id="count-modal-content">
-            <form method="post" class="register-modal-form register-fix" id="create-count-form">
+        <div class="modal-window-content" id="account-modal-content">
+            <form method="post" class="register-modal-form register-fix" id="create-account-form">
                 <div class="model-rows">
                     <div class="register-form-colomn">
-                        <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+                        <input type="hidden"  th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
                         <input type="hidden" name="owner.id" id="owner.id">
                         <label class="input-label">
                             Название
-                            <input required type="text" class="text-input" name="count-name" id="count-name" pattern="[А-Яа-я]+">
+                            <input required type="text" class="text-input" name="account-name" id="account-name" pattern="[А-Яа-я]+">
                         </label>
                         <label class="input-label">
                             Вид валюты
@@ -233,7 +205,58 @@
                         </label>
                     </div>
                 </div>
-                <button class="send-button" onclick="createNewCount(event)" value="Sign Up"/>
+                <button class="send-button" onclick="createNewAccount(event)">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-container" id="obligation-modal" style="display: none">
+    <div class="modal-background" id="obligation-modal-bg"></div>
+    <div class="modal-window">
+        <div class="modal-window-header">
+            <p>Создать счет</p>
+            <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
+                 height="20px" width="20px" version="1.1" id="obligation-modal-header-cross" viewBox="0 0 490 490"
+                 xml:space="preserve">
+                        <polygon
+                                points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
+                    </svg>
+        </div>
+        <div class="modal-window-content" id="obligation-modal-content">
+            <form method="post" class="register-modal-form register-fix" id="create-obligation-form">
+                <div class="model-rows">
+                    <div class="register-form-colomn">
+                        <input type="hidden"  th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+                        <input type="hidden" name="obligation.owner.id" id="obligation.owner.id">
+                        <label class="input-label">
+                            Дата начала договора
+                            <input required type="date" class="text-input" name="obligation.startTime" id="obligation.startTime">
+                        </label>
+                        <label class="input-label">
+                            Депозитный план
+                            <select required name="obligation.obligationPlan.id" id="obligation.obligationPlan.id">
+                                <!--/*@thymesVar id="plans" type="java.util.List<ru.bendricks.piris.model.ObligationPlan>"*/-->
+                                <option th:each="planOpt : ${plans}" th:value="${planOpt.getId()}" th:text="${planOpt.getName().concat(' ').concat(planOpt.getCurrency().toString()).concat(' ').concat(planOpt.getPlanPercent()).concat('% ').concat(planOpt.months).concat(' месяцев макс.')}"></option>
+                            </select>
+                        </label>
+                        <label class="input-label">
+                            Стартовый баланс
+                            <input required type="number" class="text-input" name="startBalance" id="startBalance">
+                        </label>
+                        <label class="input-label">
+                            Количество месяцев
+                            <input required type="text" class="text-input" name="months" id="months">
+                        </label>
+                        <label class="input-label">
+                            IBAN платёжного счёта
+                            <select required name="paymentIban" id="paymentIban">
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <button class="send-button" onclick="createNewObligation(event)">Создать</button>
             </form>
         </div>
     </div>
@@ -244,18 +267,21 @@
         <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
         <p>Все пользователи</p>
     </div>
-    <div class="tablinks" onclick="openTab(event, 'Accounts')">
-        <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
-        <p>Счета</p>
-    </div>
-    <div class="tablinks" onclick="openTab(event, 'Obligations')">
-        <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
-        <p>Договоры</p>
-    </div>
-    <div class="navigation-bar-element">
-        <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
-        <p>Администрирование</p>
-    </div>
+<!--    <div class="tablinks" onclick="openTab(event, 'Accounts')">-->
+<!--        <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">-->
+<!--        <p>Счета</p>-->
+<!--    </div>-->
+<!--    <div class="tablinks" onclick="openTab(event, 'Obligations')">-->
+<!--        <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">-->
+<!--        <p>Договоры</p>-->
+<!--    </div>-->
+    <a href="/main" class="navigation-bar-element">
+        На главную
+    </a>
+    <form action="/auth/logout" method="post" class="navigation-bar-element">
+        <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+        <input type="submit" value="Выйти">
+    </form>
 </div>
 
 <div class="main-page">
@@ -302,7 +328,22 @@
             document.getElementById("admin-tablinks active").style.background = "#79f6f6";
         }
 
+        async function configureAccordeons(){
+            let acc = document.getElementsByClassName("account-item");
+            let i;
 
+            for (i = 0; i < acc.length; i++) {
+                acc[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    let panel = this.nextElementSibling;
+                    if (panel.style && panel.style.display && panel.style.display === "block") {
+                        panel.style.display = "none";
+                    } else {
+                        panel.style.display = "block";
+                    }
+                });
+            }
+        }
 
         let sexEnum = {
             MALE: "Мужчина",
@@ -354,8 +395,33 @@
                 //document.getElementById('modal-content').innerHTML = ''
             })
 
+            document.getElementById("account-modal-header-cross").addEventListener('click', () => {
+                document.getElementById("account-modal").style.display = 'none'
+                //document.getElementById('modal-content').innerHTML = ''
+            })
+
+            document.getElementById("obligation-modal-header-cross").addEventListener('click', () => {
+                document.getElementById("obligation-modal").style.display = 'none'
+                //document.getElementById('modal-content').innerHTML = ''
+            })
+
             document.getElementById("modal-bg").addEventListener('click', () => {
                 document.getElementById("modal").style.display = 'none'
+                //document.getElementById('modal-content').innerHTML = ''
+            })
+
+            document.getElementById("user-modal-bg").addEventListener('click', () => {
+                document.getElementById("user-modal").style.display = 'none'
+                //document.getElementById('modal-content').innerHTML = ''
+            })
+
+            document.getElementById("account-modal-bg").addEventListener('click', () => {
+                document.getElementById("account-modal").style.display = 'none'
+                //document.getElementById('modal-content').innerHTML = ''
+            })
+
+            document.getElementById("obligation-modal-bg").addEventListener('click', () => {
+                document.getElementById("obligation-modal").style.display = 'none'
                 //document.getElementById('modal-content').innerHTML = ''
             })
 
@@ -363,7 +429,7 @@
         }
 
         async function deleteUser(id) {
-            let response = await fetch(`/auth/user/${id}`, {
+            let response = await fetch(`/users/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': _csrfToken
@@ -408,36 +474,249 @@
                             <a href="/auth/edit/${user.id}">Изменить</a>
                         </div>
                         `
-                let container2 = document.getElementById('adminPersonal')
+                await getAccountsByUserId(id)
+                await getObligationsByUserId(id)
                 modal.style.display = 'block'
+                await configureAccordeons()
             } else {
                 alert("Произошла ошика при загрузке пользователей")
             }
         }
 
-        async function countModel(user) {
-            if (user) {
-                let modal = document.getElementById('user-modal')
-                // let container = document.getElementById('adminPersonal')
-                // container.innerHTML = `
-                //
-                //         `
-                modal.style.display = 'block'
+        async function openAccountModal(id) {
+            let modal = document.getElementById('account-modal')
+            document.getElementById('owner.id').value = id
+            modal.style.display = 'block'
+        }
+
+        async function openObligationModal(id) {
+            let modal = document.getElementById('obligation-modal')
+            document.getElementById('obligation.owner.id').value = id
+            let response = await fetch(`/accounts/user/${id}/payment?currency=BYN`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            let data = await response.json()
+            let innerHtml = ''
+            for (const el of data) {
+                innerHtml += `
+                <option value="${el.iban}">${el.iban} ${el.balance / 100} ${el.currency}</option>
+                `
+            }
+            document.getElementById('paymentIban').innerHTML = innerHtml
+            modal.style.display = 'block'
+        }
+
+        async function createNewAccount(ev) {
+            ev.preventDefault()
+            let formData = new FormData(document.getElementById('create-account-form'))
+            let data = {
+                owner: {
+                    id: formData.get('owner.id')
+                },
+                name: formData.get('account-name'),
+                currency: formData.get('currency')
+            }
+            console.log(JSON.stringify(data))
+            let response = await fetch(`/accounts/payment/create`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'content-type': 'application/json',
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                alert("Создание счёта прошло успешно")
+                document.getElementById("account-modal").style.display = 'none'
             } else {
-                alert("Произошла ошика при загрузке пользователей")
+                let error = await response.json();
+                alert(JSON.stringify(error.errors));
             }
         }
 
-        async function userModel(user) {
-            if (user) {
-                let modal = document.getElementById('user-modal')
-                let container = document.getElementById('adminPersonal')
-                container.innerHTML = `
-
-                        `
-                modal.style.display = 'block'
+        async function createNewObligation(ev) {
+            ev.preventDefault()
+            let formData = new FormData(document.getElementById('create-obligation-form'))
+            let data = {
+                obligation: {
+                    owner: {
+                        id: formData.get('obligation.owner.id')
+                    },
+                    obligationPlan: {
+                        id: formData.get('obligation.obligationPlan.id')
+                    },
+                    startTime: formData.get('obligation.startTime')
+                },
+                startBalance: formData.get('startBalance') * 100,
+                months: formData.get('months'),
+                paymentIban: formData.get('paymentIban')
+            }
+            let response = await fetch(`/obligations/create`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'content-type': 'application/json',
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                alert("Создание договора прошло успешно")
+                document.getElementById("obligation-modal").style.display = 'none'
             } else {
-                alert("Произошла ошика при загрузке пользователей")
+                let error = await response.json();
+                alert(JSON.stringify(error.errors));
+            }
+        }
+
+        async function getAccountsByUserId(id) {
+            let response = await fetch(`/accounts/user/${id}/all`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                let accounts = await response.json()
+                let innerHtml = `
+                <h2>Платёжные счета:</h2>
+                <hr>
+                `
+                for (const paymAcc of accounts.payment) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Имя: ${paymAcc.name}</p>
+                        <p>Тип: ${paymAcc.accountType.description}</p>
+                        <p>Баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
+                        <p>IBAN: ${paymAcc.iban}</p>
+                    </div>
+                    `
+                }
+                innerHtml += `
+                <h2>Депозтные счета:</h2>
+                <hr>
+                `
+                for (const depositAcc of accounts.deposit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Имя: ${depositAcc.name}</p>
+                        <p>Тип: ${depositAcc.accountType.description}</p>
+                        <p>Баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
+                        <p>IBAN: ${depositAcc.iban}</p>
+                    </div>
+                    `
+                }
+                innerHtml += `
+                <h2>Кредитные счета:</h2>
+                <hr>
+                `
+                for (const creditAcc of accounts.credit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Имя: ${creditAcc.name}</p>
+                        <p>Тип: ${creditAcc.accountType.description}</p>
+                        <p>Баланс: ${creditAcc.balance / 100} ${creditAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[creditAcc.status]}</p>
+                        <p>IBAN: ${creditAcc.iban}</p>
+                    </div>
+                    `
+                }
+                innerHtml += `<button value="Создать" onclick="openAccountModal(${id})">Создать счет</button>`
+                document.getElementById('adminAccounts').innerHTML = innerHtml
+            }
+        }
+
+        async function getObligationsByUserId(id) {
+            let response = await fetch(`/obligations/user/${id}/all`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                let obligations = await response.json()
+                let innerHtml = `
+                <h2>Депозитные договора:</h2>
+                <hr>
+                `
+                for (const depositObl of obligations.deposit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Номер договора: ${depositObl.contractNumber}</p>
+                        <p>Тип договора: ${obligationTypeEnum[depositObl.obligationType]}</p>
+                        <p>Валюта: ${depositObl.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Депозитный план: ${depositObl.obligationPlan.name} ${depositObl.obligationPlan.planPercent}% ${depositObl.obligationPlan.currency} до ${depositObl.obligationPlan.months} месяцев</p>
+                        <p>Сумма вклада: ${depositObl.amount / 100} ${depositObl.currency}</p>
+                        <div class="account-item">
+                            <p>Имя: ${depositObl.mainAccount.name}</p>
+                            <p>Тип: ${depositObl.mainAccount.accountType.description}</p>
+                            <p>Баланс: ${depositObl.mainAccount.balance / 100} ${depositObl.mainAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[depositObl.mainAccount.status]}</p>
+                            <p>IBAN: ${depositObl.mainAccount.iban}</p>
+                        </div>
+                        <div class="account-item">
+                            <p>Имя: ${depositObl.percentAccount.name}</p>
+                            <p>Тип: ${depositObl.percentAccount.accountType.description}</p>
+                            <p>Баланс: ${depositObl.percentAccount.balance / 100} ${depositObl.percentAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
+                            <p>IBAN: ${depositObl.percentAccount.iban}</p>
+                        </div>
+                    </div>
+                    `
+                }
+                innerHtml += `
+                <h2>Кредитные договоры:</h2>
+                <hr>
+                `
+                for (const creditObl of obligations.credit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Номер договора: ${creditObl.contractNumber}</p>
+                        <p>Тип договора: ${obligationTypeEnum[creditObl.obligationType]}</p>
+                        <p>Валюта: ${creditObl.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Депозитный план: ${creditObl.obligationPlan.name} ${creditObl.obligationPlan.planPercent}% ${creditObl.obligationPlan.currency} до ${creditObl.obligationPlan.months} месяцев</p>
+                        <p>Сумма вклада: ${creditObl.amount / 100} ${creditObl.currency}</p>
+                        <div class="account-item">
+                            <p>Имя: ${creditObl.mainAccount.name}</p>
+                            <p>Тип: ${creditObl.mainAccount.accountType.description}</p>
+                            <p>Баланс: ${creditObl.mainAccount.balance / 100} ${creditObl.mainAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[creditObl.mainAccount.status]}</p>
+                            <p>IBAN: ${creditObl.mainAccount.iban}</p>
+                        </div>
+                        <div class="account-item">
+                            <p>Имя: ${creditObl.percentAccount.name}</p>
+                            <p>Тип: ${creditObl.percentAccount.accountType.description}</p>
+                            <p>Баланс: ${creditObl.percentAccount.balance / 100} ${creditObl.percentAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[creditObl.percentAccount.status]}</p>
+                            <p>IBAN: ${creditObl.percentAccount.iban}</p>
+                        </div>
+                    </div>
+                    `
+                }
+                innerHtml += `<button value="Создать" onclick="openObligationModal(${id})">Создать договор</button>`
+                document.getElementById('adminObligations').innerHTML = innerHtml
             }
         }
 
@@ -448,6 +727,18 @@
         async function updateUserModel(id) {
             let user = await getUser(id);
             await userModel(user);
+        }
+
+        async function userModel(user) {
+            if (user) {
+                let modal = document.getElementById('user-modal')
+                let container = document.getElementById('adminPersonal')
+                container.innerHTML = `
+                        `
+                modal.style.display = 'block'
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
         }
 
         async function getUser(id) {
@@ -492,21 +783,6 @@
             }
         }
 
-        let acc = document.getElementsByClassName("account-item");
-        let i;
-
-        for (i = 0; i < acc.length; i++) {
-            acc[i].addEventListener("click", function () {
-                this.classList.toggle("active");
-                let panel = this.nextElementSibling;
-                if (panel.style.display === "block") {
-                    panel.style.display = "none";
-                } else {
-                    panel.style.display = "block";
-                }
-            });
-        }
-
         async function createNewUser(ev) {
             ev.preventDefault()
             let formData = new FormData(document.getElementById('create-user-form'))
@@ -543,7 +819,7 @@
             })
             if (response.status == 200) {
                 alert("Создание пользователя прошло успешно")
-                document.getElementById("user-modal-header-cross").click()
+                document.getElementById("user-modal").style.display = 'none'
             } else {
                 let error = await response.json();
                 alert(JSON.stringify(error.errors));

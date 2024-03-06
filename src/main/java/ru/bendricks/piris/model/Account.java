@@ -1,5 +1,9 @@
 package ru.bendricks.piris.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -24,6 +28,7 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "acc_type_code", referencedColumnName = "code")
+//    @JsonManagedReference("acc-type")
     private AccountType accountType;
 
     @Column(name = "status")
@@ -31,6 +36,8 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
+//    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User owner;
 
     @Column(name = "balance", nullable = false)
@@ -41,12 +48,19 @@ public class Account {
     private Currency currency;
 
     @OneToOne
-    private Obligation parentObligation;
+    @JsonIgnore
+    private Obligation parentObligationAsMainAccount;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToOne
+    @JsonIgnore
+    private Obligation parentObligationAsPercentAccount;
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Transaction> transactionsAsSender;
 
-    @OneToMany(mappedBy = "recipient")
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Transaction> transactionsAsRecipient;
 
 }
