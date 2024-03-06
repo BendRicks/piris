@@ -15,7 +15,19 @@
     <div class="modal-background" id="modal-bg"></div>
     <div class="modal-window">
         <div class="modal-window-header">
-            <h2 class="modal-window-header-text">Данные пользователя</h2>
+
+            <div class="admin-navigation-bar">
+                <div class="admin-tablinks active" onclick="openAdminTab(event, 'adminPersonal')">
+                    <p>Все пользователи</p>
+                </div>
+                <div class="admin-tablinks" onclick="openAdminTab(event, 'adminAccounts')">
+                    <p>Счета</p>
+                </div>
+                <div class="admin-tablinks" onclick="openAdminTab(event, 'adminObligations')">
+                    <p>Договоры</p>
+                </div>
+            </div>
+
             <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
                  height="20px" width="20px" version="1.1" id="modal-header-cross" viewBox="0 0 490 490"
@@ -25,7 +37,42 @@
                     </svg>
         </div>
         <div class="modal-window-content" id="modal-content">
+            <div id="adminPersonal" class="admin-tab-content" style="display: block;">
 
+            </div>
+
+            <div id="adminAccounts" class="admin-tab-content">
+                <div class="account-item">
+                    <p>IBAN: ${paymAcc.iban}</p>
+                    <p>имя: ${paymAcc.name}</p>
+                    <p>тип: ${paymAcc.accountType.description}</p>
+                    <p>баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
+                </div>
+                <div class="panel">
+                    <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
+                </div>
+            </div>
+
+            <div id="adminObligations" class="admin-tab-content">
+                <div class="account-item">
+                    <p>IBAN: ${depositAcc.iban}</p>
+                    <p>имя: ${depositAcc.name}</p>
+                    <p>тип: ${depositAcc.accountType.description}</p>
+                    <p>баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
+                </div>
+                <div class="panel">
+                    <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
+                    <div class="account-item">
+                        <p>Номер договора: ${depositAcc.parentObligation.contractNumber}</p>
+                        <p>Тип договора: ${obligationTypeEnum[depositAcc.parentObligation.obligationType]}</p>
+                        <p>Валюта: ${depositAcc.parentObligation.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Депозитный план: ${depositAcc.parentObligation.obligationPlan.name} ${depositAcc.parentObligation.obligationPlan.planPercent}% ${depositAcc.parentObligation.obligationPlan.currency} до ${depositAcc.parentObligation.obligationPlan.months} месяцев</p>
+                        <p>Сумма вклада: ${depositAcc.parentObligation.amount / 100} ${depositAcc.parentObligation.currency}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -49,21 +96,21 @@
 </div>
 
 <div class="main-page">
-    <div id="AllUsers" class="tabcontent" style="display: block;">
+    <div id="AllUsers" class="admin-tab-content" style="display: block;">
 
     </div>
 
-    <div id="Accounts" class="tabcontent">
+    <div id="Accounts" class="admin-tab-content">
 
     </div>
 
-    <div id="Obligations" class="tabcontent">
+    <div id="Obligations" class="admin-tab-content">
 
     </div>
 
     <script>
         function openTab(evt, tabName) {
-            var i, tabcontent, tablinks, current;
+            let i, tabcontent, tablinks, current;
             tabcontent = document.getElementsByClassName("tabcontent");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
@@ -76,6 +123,23 @@
             evt.currentTarget.className += " active";
             document.getElementById("tablinks active").style.background = "#79f6f6";
         }
+
+        function openAdminTab(evt, tabName) {
+            let i, tabcontent, tablinks, current;
+            tabcontent = document.getElementsByClassName("admin-tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("admin-tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+            document.getElementById("admin-tablinks active").style.background = "#79f6f6";
+        }
+
+
 
         let sexEnum = {
             MALE: "Мужчина",
@@ -148,81 +212,33 @@
             let user = await getUser(id)
             if (user) {
                 let modal = document.getElementById('modal')
-                let container = document.getElementById('modal-content')
+                let container = document.getElementById('adminPersonal')
                 container.innerHTML = `
+                        <div class="admin-personal-info">
+                            <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
+                            <p>Дата рождения: ${user.birthDate}</p>
+                            <p>Пол: ${sexEnum[user.sex]}</p>
+                            <p>Идентификационный номер: ${user.passportId}</p>
+                            <p>Орган, выдавший документ: ${user.competentOrgan}</p>
+                            <p>Дата выдачи: ${user.dateOfIssue}</p>
+                            <p>Номер паспорта: ${user.passportSerial}</p>
+                            <p>Город проживания: ${cityOfResidenceEnum[user.cityOfResidence]}</p>
+                            <p>Место рождения: ${user.birthLocation}</p>
+                            <p>Адрес проживания: ${user.addressOfLiving}</p>
+                            <p>Адрес прописки: ${user.placeOfResidence}</p>
+                            <p>Домашний телефон: ${user.homePhoneNumber}</p>
+                            <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
+                            <p>email: ${user.email}</p>
+                            <p>Гражданство: ${citizenshipEnum[user.citizenship]}</p>
+                            <p>Семейное положение: ${maritalStatusEnum[user.maritalStatus]}</p>
+                            <p>Инвалидность: ${disabilityEnum[user.disability]}</p>
+                            <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
+                            <p>Ежемесячный доход: ${user.monthlyIncome}</p>
+                        </div>
                         <div class="modal-window-content-row">
-            <div class="modal-window-content-row-element">
-                <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Дата рождения: ${user.birthDate}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Пол: ${user.sex}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Идентификационный номер: ${user.passportId}</p>
-            </div>
-        </div>
-        <div class="modal-window-content-row">
-            <div class="modal-window-content-row-element">
-                <p>Орган, выдавший документ: ${user.competentOrgan}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Дата выдачи: ${user.dateOfIssue}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Номер паспорта: ${user.passportSerial}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Город проживания: ${user.cityOfResidence}</p>
-            </div>
-        </div>
-        <div class="modal-window-content-row">
-            <div class="modal-window-content-row-element">
-                <p>Место рождения: ${user.birthLocation}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Адрес проживания: ${user.addressOfLiving}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Адрес прописки: ${user.placeOfResidence}</p>
-            </div>
-        </div>
-        <div class="modal-window-content-row">
-            <div class="modal-window-content-row-element">
-                <p>Домашний телефон: ${user.homePhoneNumber}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Мобильный телефон: ${user.mobilePhoneNumber}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>email: ${user.email}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Гражданство: ${user.citizenship}</p>
-            </div>
-        </div>
-        <div class="modal-window-content-row">
-            <div class="modal-window-content-row-element">
-                <p>Семейное положение: ${user.maritalStatus}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Инвалидность: ${user.disability}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Пенсионер: ${user.pensioner === "true" ? "Да" : "Нет"}</p>
-            </div>
-            <div class="modal-window-content-row-element">
-                <p>Ежемесячный доход: ${user.monthlyIncome}</p>
-            </div>
-        </div>
-        <div class="modal-window-content-row">
-            <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
-            <a href="/auth/edit/${user.id}">Изменить</a>
-            <a href="/obligation/user/${user.id}">Договоры</a>
-            <a href="/account/user/${user.id}">Счета</a>
-        </div>
+                            <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
+                            <a href="/auth/edit/${user.id}">Изменить</a>
+                        </div>
                         `
                 modal.style.display = 'block'
             } else {
@@ -267,6 +283,21 @@
             } else {
                 alert("Произошла ошика при загрузке пользователей")
             }
+        }
+
+        let acc = document.getElementsByClassName("account-item");
+        let i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                let panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
         }
 
     </script>
