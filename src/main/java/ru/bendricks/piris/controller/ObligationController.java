@@ -13,6 +13,7 @@ import ru.bendricks.piris.service.AccountService;
 import ru.bendricks.piris.service.ObligationService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +25,10 @@ public class ObligationController {
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<Obligation> getCurrentUserObligations(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return obligationService.getObligationsByUserId(userDetails.getId());
+    public Map<String, List<Obligation>> getCurrentUserObligations(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        var obligations = obligationService.getObligationsByUserId(userDetails.getId());
+        return Map.of("deposit", obligations.stream().filter(obligation -> obligation.getObligationType() == ObligationType.DEPOSIT || obligation.getObligationType() == ObligationType.DEPOSIT_UNTOUCH).toList(),
+                "credit", obligations.stream().filter(obligation -> obligation.getObligationType() == ObligationType.CREDIT || obligation.getObligationType() == ObligationType.CREDIT_ANUAL).toList());
     }
 
     @PostMapping("/deposit/create")
