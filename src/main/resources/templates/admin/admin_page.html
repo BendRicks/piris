@@ -51,6 +51,8 @@
                 <div class="panel">
                     <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
                 </div>
+
+                <button value="Создать" onclick="createCount()">Создать счет</button>
             </div>
 
             <div id="adminObligations" class="admin-tab-content">
@@ -91,7 +93,7 @@
                     </svg>
         </div>
         <div class="modal-window-content" id="user-modal-content">
-            <form method="post" class="register-modal-form register-fix">
+            <form method="post" class="register-modal-form register-fix" id="create-user-form">
                 <div class="model-rows">
                     <div class="register-form-colomn">
                         <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
@@ -194,7 +196,44 @@
                         </label>
                     </div>
                 </div>
-                <input type="submit" class="send-button" value="Sign Up"/>
+                <button class="send-button" onclick="createNewUser(event)" value="Sign Up"/>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-container" id="count-modal" style="display: block">
+    <div class="modal-background" id="count-modal-bg"></div>
+    <div class="modal-window">
+        <div class="modal-window-header">
+            <p>Создать счет</p>
+            <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
+                 height="20px" width="20px" version="1.1" id="count-modal-header-cross" viewBox="0 0 490 490"
+                 xml:space="preserve">
+                        <polygon
+                                points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490   489.292,457.678 277.331,245.004 489.292,32.337 "/>
+                    </svg>
+        </div>
+        <div class="modal-window-content" id="count-modal-content">
+            <form method="post" class="register-modal-form register-fix" id="create-count-form">
+                <div class="model-rows">
+                    <div class="register-form-colomn">
+                        <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+                        <input type="hidden" name="owner.id" id="owner.id">
+                        <label class="input-label">
+                            Название
+                            <input required type="text" class="text-input" name="count-name" id="count-name" pattern="[А-Яа-я]+">
+                        </label>
+                        <label class="input-label">
+                            Вид валюты
+                            <select required name="currency" id="currency">
+                                <option th:each="currencyOpt : ${T(ru.bendricks.piris.model.Currency).values()}" th:value="${currencyOpt}" th:text="${currencyOpt.toString()}"></option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <button class="send-button" onclick="createNewCount(event)" value="Sign Up"/>
             </form>
         </div>
     </div>
@@ -369,6 +408,20 @@
                             <a href="/auth/edit/${user.id}">Изменить</a>
                         </div>
                         `
+                let container2 = document.getElementById('adminPersonal')
+                modal.style.display = 'block'
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
+
+        async function countModel(user) {
+            if (user) {
+                let modal = document.getElementById('user-modal')
+                // let container = document.getElementById('adminPersonal')
+                // container.innerHTML = `
+                //
+                //         `
                 modal.style.display = 'block'
             } else {
                 alert("Произошла ошика при загрузке пользователей")
@@ -452,6 +505,49 @@
                     panel.style.display = "block";
                 }
             });
+        }
+
+        async function createNewUser(ev) {
+            ev.preventDefault()
+            let formData = new FormData(document.getElementById('create-user-form'))
+            let userData = {
+                email: formData.get('email'),
+                surname: formData.get('surname'),
+                name: formData.get('name'),
+                givenName: formData.get('givenName'),
+                birthDate: formData.get('birthDate'),
+                sex: formData.get('sex'),
+                passportSerial: formData.get('passportSerial'),
+                competentOrgan: formData.get('competentOrgan'),
+                dateOfIssue: formData.get('dateOfIssue'),
+                passportId: formData.get('passportId'),
+                birthLocation: formData.get('birthLocation'),
+                cityOfResidence: formData.get('cityOfResidence'),
+                addressOfLiving: formData.get('addressOfLiving'),
+                homePhoneNumber: formData.get('homePhoneNumber'),
+                mobilePhoneNumber: formData.get('mobilePhoneNumber'),
+                placeOfResidence: formData.get('placeOfResidence'),
+                maritalStatus: formData.get('maritalStatus'),
+                citizenship: formData.get('citizenship'),
+                disability: formData.get('disability'),
+                pensioner: formData.get('pensioner'),
+                monthlyIncome: formData.get('monthlyIncome'),
+            }
+            let response = await fetch(`/users/create`, {
+                method: 'POST',
+                body: JSON.stringify(userData),
+                headers: {
+                    'content-type': 'application/json',
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                alert("Создание пользователя прошло успешно")
+                document.getElementById("user-modal-header-cross").click()
+            } else {
+                let error = await response.json();
+                alert(JSON.stringify(error.errors));
+            }
         }
 
     </script>
