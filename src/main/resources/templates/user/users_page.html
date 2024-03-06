@@ -53,24 +53,6 @@
     </div>
 </div>
 
-<script>
-    function openTab(evt, tabName) {
-        var i, tabcontent, tablinks, current;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-        document.getElementById("tablinks active").style.background = "#79f6f6";
-    }
-</script>
-
-
 <div class="main-page">
     <div id="Personal" class="tabcontent" style="display: block;">
 
@@ -78,13 +60,26 @@
     <div id="Accounts" class="tabcontent">
 
     </div>
-
     <div id="Obligations" class="tabcontent">
-        <h3>Tokyo</h3>
-        <p>Tokyo is the capital of Japan.</p>
+
     </div>
 
     <script>
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks, current;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+            document.getElementById("tablinks active").style.background = "#79f6f6";
+        }
 
         let acc = document.getElementsByClassName("account-item");
         let i;
@@ -193,6 +188,90 @@
             }
         }
 
+        async function getObligations() {
+            let response = await fetch(`/obligations/my`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                let obligations = await response.json()
+                let innerHtml = `
+                <h2>Депозитные договора:</h2>
+                <hr>
+                `
+                for (const depositObl of obligations.deposit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Номер договора: ${depositObl.contractNumber}</p>
+                        <p>Тип договора: ${obligationTypeEnum[depositObl.obligationType]}</p>
+                        <p>Валюта: ${depositObl.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Депозитный план: ${depositObl.obligationPlan.name} ${depositObl.obligationPlan.planPercent}% ${depositObl.obligationPlan.currency} до ${depositObl.obligationPlan.months} месяцев</p>
+                        <p>Сумма вклада: ${depositObl.amount / 100} ${depositObl.currency}</p>
+                        <div class="account-item">
+                            <p>IBAN: ${depositObl.mainAccount.iban}</p>
+                            <p>имя: ${depositObl.mainAccount.name}</p>
+                            <p>тип: ${depositObl.mainAccount.accountType.description}</p>
+                            <p>баланс: ${depositObl.mainAccount.balance / 100} ${depositObl.mainAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[depositObl.mainAccount.status]}</p>
+                        </div>
+                        <div class="account-item">
+                            <p>IBAN: ${depositObl.percentAccount.iban}</p>
+                            <p>имя: ${depositObl.percentAccount.name}</p>
+                            <p>тип: ${depositObl.percentAccount.accountType.description}</p>
+                            <p>баланс: ${depositObl.percentAccount.balance / 100} ${depositObl.percentAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
+                            <button onclick="openUserModal(1)">Перевести деньги</button>
+                        </div>
+                    </div>
+                    `
+                }
+                innerHtml += `
+                <h2>Кредитные договоры:</h2>
+                <hr>
+                `
+                for (const creditObl of obligations.credit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>Номер договора: ${creditObl.contractNumber}</p>
+                        <p>Тип договора: ${obligationTypeEnum[creditObl.obligationType]}</p>
+                        <p>Валюта: ${creditObl.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Депозитный план: ${creditObl.obligationPlan.name} ${creditObl.obligationPlan.planPercent}% ${creditObl.obligationPlan.currency} до ${creditObl.obligationPlan.months} месяцев</p>
+                        <p>Сумма вклада: ${creditObl.amount / 100} ${creditObl.currency}</p>
+                        <div class="account-item">
+                            <p>IBAN: ${creditObl.mainAccount.iban}</p>
+                            <p>имя: ${creditObl.mainAccount.name}</p>
+                            <p>тип: ${creditObl.mainAccount.accountType.description}</p>
+                            <p>баланс: ${creditObl.mainAccount.balance / 100} ${creditObl.mainAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[creditObl.mainAccount.status]}</p>
+                            <button onclick="openUserModal(1)">Перевести деньги</button>
+                        </div>
+                        <div class="account-item">
+                            <p>IBAN: ${creditObl.percentAccount.iban}</p>
+                            <p>имя: ${creditObl.percentAccount.name}</p>
+                            <p>тип: ${creditObl.percentAccount.accountType.description}</p>
+                            <p>баланс: ${creditObl.percentAccount.balance / 100} ${creditObl.percentAccount.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Статус: ${recordStatusEnum[depositObl.percentAccount.status]}</p>
+                        </div>
+                    </div>
+                    `
+                }
+            }
+        }
+
         async function getAccounts() {
             let response = await fetch(`/accounts/my`, {
                 method: 'GET',
@@ -289,45 +368,6 @@
                 alert("Произошла ошика при загрузке пользователей")
             }
         }
-
-        // async function getUser(id) {
-        //     let response = await fetch(`/users/user/${id}`, {
-        //         method: 'GET',
-        //         headers: {
-        //             'X-CSRF-TOKEN': _csrfToken
-        //         }
-        //     })
-        //     if (response.status == 200) {
-        //         return response.json();
-        //     }
-        //     return null;
-        // }
-
-        // async function getAllUsers() {
-        //     let response = await fetch('/users/get_all_users', {
-        //         method: 'GET',
-        //         headers: {
-        //             'X-CSRF-TOKEN': _csrfToken
-        //         }
-        //     })
-        //     if (response.status == 200) {
-        //         let container = document.getElementById('users-container')
-        //         let innerHtml = ''
-        //         let data = await response.json()
-        //         for (const el of data) {
-        //             innerHtml += `
-        //                         <div class="user-item" id="user_${el.id}" onclick="openUserModal(${el.id})">
-        //                             <p>${el.surname} ${el.name} ${el.givenName}</p>
-        //                             <p>${el.passportId}</p>
-        //                         </div>
-        //                     `
-        //         }
-        //         container.innerHTML = innerHtml
-        //         // console.log()
-        //     } else {
-        //         alert("Произошла ошика при загрузке пользователей")
-        //     }
-        // }
 
     </script>
 
