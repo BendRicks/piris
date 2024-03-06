@@ -77,22 +77,11 @@
 
 
         <div id="Accounts" class="tabcontent">
-
-<!--            <div class="account-item">-->
-<!--                <p>iban</p>-->
-<!--                <p>iban</p>-->
-<!--                <p>iban</p>-->
-<!--            </div>-->
-<!--            <div class="account-item-hidden">-->
-<!--                <p>Буянов хуесос</p>-->
-<!--            </div>-->
-
             <div class="account-item">
                 <p>IBAN: ${account.iban}</p>
                 <p>имя: ${account.name}</p>
                 <p>тип: ${account.type}</p>
                 <p>баланс: ${account.balance}</p>
-
             </div>
             <div class="panel">
                 <p>Lorem ipsum...</p>
@@ -121,34 +110,55 @@
                 <p>Lorem ipsum...</p>
             </div>
 
-
-            <script>
-                var acc = document.getElementsByClassName("account-item");
-                var i;
-
-                for (i = 0; i < acc.length; i++) {
-                    acc[i].addEventListener("click", function() {
-                        /* Toggle between adding and removing the "active" class,
-                        to highlight the button that controls the panel */
-                        this.classList.toggle("active");
-
-                        /* Toggle between hiding and showing the active panel */
-                        var panel = this.nextElementSibling;
-                        if (panel.style.display === "block") {
-                            panel.style.display = "none";
-                        } else {
-                            panel.style.display = "block";
-                        }
-                    });
-                }
-            </script>
-
         </div>
 
         <div id="Obligations" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
+            <div class="account-item">
+                <p>тип: ${obligation.type}</p>
+                <p>план: ${obligation.plan}</p>
+                <p>номер договора: ${obligation.contractNumber}</p>
+                <p>сумма: ${obligation.amount}</p>
+                <p>тип валюты: ${obligation.currency}</p>
+            </div>
+            <div class="panel">
+                <p>Доп данные...</p>
+                <p>Доп данные...</p>
+                <p>Доп данные...</p>
+                <p>Доп данные...</p>
+                <div class="account-item">
+                    <p>дополнительный аккордеон говна</p>
+                    <p>дополнительный аккордеон говна</p>
+                    <p>дополнительный аккордеон говна</p>
+                </div>
+                <div class="panel">
+                    <p>Данные...</p>
+                    <p>Данные...</p>
+                    <p>Данные...</p>
+                    <p>Данные...</p>
+                </div>
+
+            </div>
         </div>
+        <script>
+            var acc = document.getElementsByClassName("account-item");
+            var i;
+
+            for (i = 0; i < acc.length; i++) {
+                acc[i].addEventListener("click", function() {
+                    /* Toggle between adding and removing the "active" class,
+                    to highlight the button that controls the panel */
+                    this.classList.toggle("active");
+
+                    /* Toggle between hiding and showing the active panel */
+                    var panel = this.nextElementSibling;
+                    if (panel.style.display === "block") {
+                        panel.style.display = "none";
+                    } else {
+                        panel.style.display = "block";
+                    }
+                });
+            }
+        </script>
         <a href="/auth/signup">Добавить пользователя</a>
         <div class="users-items-container" id="users-container">
             <h2>Пользователи</h2>
