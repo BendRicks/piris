@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title>Users</title>
@@ -29,165 +30,144 @@
         </div>
     </div>
 </div>
-    <div class="navigation-bar">
-        <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'Personal')">
-            <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
-            <p>Личная информация</p>
-        </div>
-        <div class="tablinks" onclick="openTab(event, 'Accounts')">
-            <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
-            <p>Счета</p>
-        </div>
-        <div class="tablinks" onclick="openTab(event, 'Obligations')">
-            <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
-            <p>Договоры</p>
-        </div>
-        <div class="navigation-bar-element">
-            <img src="https://cdn-icons-png.flaticon.com/128/584/584072.png" width="60%">
-            <p>ATM</p>
-        </div>
-        <div class="navigation-bar-element">
-            <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
-            <p>Администрирование</p>
-        </div>
+<div class="navigation-bar">
+    <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'Personal')">
+        <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
+        <p>Личная информация</p>
+    </div>
+    <div class="tablinks" onclick="openTab(event, 'Accounts')">
+        <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
+        <p>Счета</p>
+    </div>
+    <div class="tablinks" onclick="openTab(event, 'Obligations')">
+        <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
+        <p>Договоры</p>
+    </div>
+    <div class="navigation-bar-element">
+        <img src="https://cdn-icons-png.flaticon.com/128/584/584072.png" width="60%">
+        <p>ATM</p>
+    </div>
+    <div class="navigation-bar-element">
+        <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
+        <p>Администрирование</p>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks, current;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+        document.getElementById("tablinks active").style.background = "#79f6f6";
+    }
+</script>
+
+
+<div class="main-page">
+    <div id="Personal" class="tabcontent" style="display: block;">
+
+    </div>
+    <div id="Accounts" class="tabcontent">
+
+    </div>
+
+    <div id="Obligations" class="tabcontent">
+        <h3>Tokyo</h3>
+        <p>Tokyo is the capital of Japan.</p>
     </div>
 
     <script>
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks, current;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-            document.getElementById("tablinks active").style.background = "#79f6f6";
+
+        let acc = document.getElementsByClassName("account-item");
+        let i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                let panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
         }
-    </script>
 
+        let sexEnum = {
+            MALE: "Мужчина",
+            FEMALE: "Женщина",
+            ATTACK_HELICOPTER: "Атакующий вретолет",
+            CROISSANT: "Круассан"
+        }
+        let maritalStatusEnum = {SINGLE: "Одинок/Одинока", MARRIED: "Женат/Замужем"}
+        let cityOfResidenceEnum = {
+            MINSK: "Минск",
+            BREST: "Брест",
+            GOMEL: "Гомель",
+            GRODNO: "Гродно",
+            VITEBSK: "Витебск",
+            MOGILEV: "Могилёв"
+        }
+        let citizenshipEnum = {
+            REPUBLIC_OF_BELARUS: "Республика Беларусь",
+            REPUBLIC_OF_POLAND: "Rzeczpospolita Polska",
+            RUSSIAN_FEDERATION: "Русня"
+        }
+        let disabilityEnum = {
+            NO: "Нет",
+            FIRST_LEVEL: "Первой степени",
+            SECOND_LEVEL: "Второй степени",
+            THIRD_LEVEL: "Третьей степени"
+        }
+        let recordStatusEnum = {
+            ACTIVE: "Активен",
+            CLOSED: "Закрыт",
+            END_OF_SERVICE: "Окончание действия"
+        }
+        let obligationTypeEnum = {
+            DEPOSIT: "Депозит отзывной",
+            DEPOSIT_UNTOUCH: "Депозит безотзывной",
+            CREDIT: "Кредит",
+            CREDIT_ANUAL: "Кредит анальный"
+        }
 
-    <div class="main-page">
-        <div id="Personal" class="tabcontent" style="display: block;">
+        window.onload = async () => {
 
-        </div>
+            await loadUserInfo()
+            await getAccounts()
 
+            document.getElementById("modal-header-cross").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
 
-        <div id="Accounts" class="tabcontent">
+            document.getElementById("modal-bg").addEventListener('click', () => {
+                document.getElementById("modal").style.display = 'none'
+                document.getElementById('modal-content').innerHTML = ''
+            })
 
-<!--            <div class="account-item">-->
-<!--                <p>iban</p>-->
-<!--                <p>iban</p>-->
-<!--                <p>iban</p>-->
-<!--            </div>-->
-<!--            <div class="account-item-hidden">-->
-<!--                <p>Буянов хуесос</p>-->
-<!--            </div>-->
+            // await getAllUsers();
+        }
 
-            <div class="account-item">
-                <p>IBAN: ${account.iban}</p>
-                <p>имя: ${account.name}</p>
-                <p>тип: ${account.type}</p>
-                <p>баланс: ${account.balance}</p>
-
-            </div>
-            <div class="panel">
-                <p>Lorem ipsum...</p>
-                <p>Lorem ipsum...</p>
-                <p>Lorem ipsum...</p>
-                <div class="account-item">
-                    <p>IBAN: ${account.iban}</p>
-                    <p>имя: ${account.name}</p>
-                    <p>тип: ${account.type}</p>
-                    <p>баланс: ${account.balance}</p>
-                </div>
-                <div class="panel">
-                    <p>Lorem ipsum...</p>
-                    <p>Lorem ipsum...</p>
-                </div>
-
-            </div>
-
-            <button class="account-item">Section 2</button>
-            <div class="panel">
-                <p>Lorem ipsum...</p>
-            </div>
-
-            <button class="account-item">Section 3</button>
-            <div class="panel">
-                <p>Lorem ipsum...</p>
-            </div>
-
-
-            <script>
-                var acc = document.getElementsByClassName("account-item");
-                var i;
-
-                for (i = 0; i < acc.length; i++) {
-                    acc[i].addEventListener("click", function() {
-                        /* Toggle between adding and removing the "active" class,
-                        to highlight the button that controls the panel */
-                        this.classList.toggle("active");
-
-                        /* Toggle between hiding and showing the active panel */
-                        var panel = this.nextElementSibling;
-                        if (panel.style.display === "block") {
-                            panel.style.display = "none";
-                        } else {
-                            panel.style.display = "block";
-                        }
-                    });
+        async function loadUserInfo() {
+            let response = await fetch(`/auth/me`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
                 }
-            </script>
-
-        </div>
-
-        <div id="Obligations" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
-        </div>
-        <a href="/auth/signup">Добавить пользователя</a>
-        <div class="users-items-container" id="users-container">
-            <h2>Пользователи</h2>
-            <script>
-
-                let sexEnum = {MALE: "Мужчина", FEMALE: "Женщина", ATTACK_HELICOPTER: "Атакующий вретолет", CROISSANT: "Круассан"}
-                let maritalStatusEnum = {SINGLE: "Одинок/Одинока", MARRIED: "Женат/Замужем"}
-                let cityOfResidenceEnum = {MINSK: "Минск", BREST: "Брест", GOMEL: "Гомель", GRODNO: "Гродно", VITEBSK: "Витебск", MOGILEV: "Могилёв"}
-                let citizenshipEnum = {REPUBLIC_OF_BELARUS: "Республика Беларусь", REPUBLIC_OF_POLAND: "Rzeczpospolita Polska", RUSSIAN_FEDERATION: "Русня"}
-                let disabilityEnum = {NO: "Нет", FIRST_LEVEL: "Первой степени", SECOND_LEVEL: "Второй степени", THIRD_LEVEL: "Третьей степени"}
-
-                window.onload = async () => {
-
-                    await loadUserInfo()
-
-                    document.getElementById("modal-header-cross").addEventListener('click', () => {
-                        document.getElementById("modal").style.display = 'none'
-                        document.getElementById('modal-content').innerHTML = ''
-                    })
-
-                    document.getElementById("modal-bg").addEventListener('click', () => {
-                        document.getElementById("modal").style.display = 'none'
-                        document.getElementById('modal-content').innerHTML = ''
-                    })
-
-                    await getAllUsers();
-                }
-
-                async function loadUserInfo() {
-                    let response = await fetch(`/auth/me`, {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        let user = await response.json()
-                        document.getElementById('Personal').innerHTML =
-                            `
+            })
+            if (response.status == 200) {
+                let user = await response.json()
+                document.getElementById('Personal').innerHTML =
+                    `
                     <div class="personal-info">
                         <p>ФИО: ${user.surname} ${user.name} ${user.givenName}</p>
                         <p>Дата рождения: ${user.birthDate}</p>
@@ -210,62 +190,147 @@
                         <p>Ежемесячный доход: ${user.monthlyIncome}</p>
                     </div>
                     `
-                    }
-                }
+            }
+        }
 
-                async function openUserModal(id) {
-                    let user = await getUser(id)
-                    if (user) {
-                        let modal = document.getElementById('modal')
-                        let container = document.getElementById('modal-content')
-                        container.innerHTML = ``
-                        modal.style.display = 'block'
-                    } else {
-                        alert("Произошла ошика при загрузке пользователей")
-                    }
+        async function getAccounts() {
+            let response = await fetch(`/accounts/my`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': _csrfToken
                 }
-
-                async function getUser(id) {
-                    let response = await fetch(`/users/user/${id}`, {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        return response.json();
-                    }
-                    return null;
+            })
+            if (response.status == 200) {
+                let accounts = await response.json()
+                let innerHtml = `
+                <h2>Платёжные счета:</h2>
+                <hr>
+                `
+                for (const paymAcc of accounts.payment) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>IBAN: ${paymAcc.iban}</p>
+                        <p>имя: ${paymAcc.name}</p>
+                        <p>тип: ${paymAcc.accountType.description}</p>
+                        <p>баланс: ${paymAcc.balance / 100} ${paymAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[paymAcc.status]}</p>
+                        <button onclick="openUserModal(1)">Перевести деньги</button>
+                    </div>
+                    `
                 }
-
-                async function getAllUsers() {
-                    let response = await fetch('/users/get_all_users', {
-                        method: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': _csrfToken
-                        }
-                    })
-                    if (response.status == 200) {
-                        let container = document.getElementById('users-container')
-                        let innerHtml = ''
-                        let data = await response.json()
-                        for (const el of data) {
-                            innerHtml += `
-                                <div class="user-item" id="user_${el.id}" onclick="openUserModal(${el.id})">
-                                    <p>${el.surname} ${el.name} ${el.givenName}</p>
-                                    <p>${el.passportId}</p>
-                                </div>
-                            `
-                        }
-                        container.innerHTML = innerHtml
-                        // console.log()
-                    } else {
-                        alert("Произошла ошика при загрузке пользователей")
-                    }
+                innerHtml += `
+                <h2>Депозтные счета:</h2>
+                <hr>
+                `
+                for (const depositAcc of accounts.deposit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>IBAN: ${depositAcc.iban}</p>
+                        <p>имя: ${depositAcc.name}</p>
+                        <p>тип: ${depositAcc.accountType.description}</p>
+                        <p>баланс: ${depositAcc.balance / 100} ${depositAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
+                        ${depositAcc.accountType.code != 3404 ? '<button onclick="openUserModal(1)">Перевести деньги</button>' : ''}
+                        <div class="account-item">
+                            <p>Номер договора: ${depositAcc.parentObligation.contractNumber}</p>
+                            <p>Тип договора: ${obligationTypeEnum[depositAcc.parentObligation.obligationType]}</p>
+                            <p>Валюта: ${depositAcc.parentObligation.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Депозитный план: ${depositAcc.parentObligation.obligationPlan.name} ${depositAcc.parentObligation.obligationPlan.planPercent}% ${depositAcc.parentObligation.obligationPlan.currency} до ${depositAcc.parentObligation.obligationPlan.months} месяцев</p>
+                            <p>Сумма вклада: ${depositAcc.parentObligation.amount / 100} ${depositAcc.parentObligation.currency}</p>
+                        </div>
+                    </div>
+                    `
                 }
+                innerHtml += `
+                <h2>Кредитные счета:</h2>
+                <hr>
+                `
+                for (const creditAcc of accounts.credit) {
+                    innerHtml += `
+                    <div class="account-item">
+                        <p>IBAN: ${creditAcc.iban}</p>
+                        <p>имя: ${creditAcc.name}</p>
+                        <p>тип: ${creditAcc.accountType.description}</p>
+                        <p>баланс: ${creditAcc.balance / 100} ${creditAcc.currency}</p>
+                    </div>
+                    <div class="panel">
+                        <p>Статус: ${recordStatusEnum[creditAcc.status]}</p>
+                        ${creditAcc.accountType.code != 2470 ? '<button onclick="openUserModal(1)">Перевести деньги</button>' : ''}
+                        <div class="account-item">
+                            <p>Номер договора: ${creditAcc.parentObligation.contractNumber}</p>
+                            <p>Тип договора: ${obligationTypeEnum[creditAcc.parentObligation.obligationType]}</p>
+                            <p>Валюта: ${creditAcc.parentObligation.currency}</p>
+                        </div>
+                        <div class="panel">
+                            <p>Кредитный план: ${creditAcc.parentObligation.obligationPlan.name} ${creditAcc.parentObligation.obligationPlan.planPercent}% ${creditAcc.parentObligation.obligationPlan.currency} до ${creditAcc.parentObligation.obligationPlan.months} месяцев</p>
+                            <p>Сумма кредита: ${creditAcc.parentObligation.amount / 100} ${creditAcc.parentObligation.currency}</p>
+                        </div>
+                    </div>
+                    `
+                }
+                document.getElementById('Accounts').innerHTML = innerHtml
+            }
+        }
 
-            </script>
-        </div>
-    </div>
+        async function openUserModal(id) {
+            let user = await getUser(id)
+            if (user) {
+                let modal = document.getElementById('modal')
+                let container = document.getElementById('modal-content')
+                container.innerHTML = ``
+                modal.style.display = 'block'
+            } else {
+                alert("Произошла ошика при загрузке пользователей")
+            }
+        }
+
+        // async function getUser(id) {
+        //     let response = await fetch(`/users/user/${id}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-CSRF-TOKEN': _csrfToken
+        //         }
+        //     })
+        //     if (response.status == 200) {
+        //         return response.json();
+        //     }
+        //     return null;
+        // }
+
+        // async function getAllUsers() {
+        //     let response = await fetch('/users/get_all_users', {
+        //         method: 'GET',
+        //         headers: {
+        //             'X-CSRF-TOKEN': _csrfToken
+        //         }
+        //     })
+        //     if (response.status == 200) {
+        //         let container = document.getElementById('users-container')
+        //         let innerHtml = ''
+        //         let data = await response.json()
+        //         for (const el of data) {
+        //             innerHtml += `
+        //                         <div class="user-item" id="user_${el.id}" onclick="openUserModal(${el.id})">
+        //                             <p>${el.surname} ${el.name} ${el.givenName}</p>
+        //                             <p>${el.passportId}</p>
+        //                         </div>
+        //                     `
+        //         }
+        //         container.innerHTML = innerHtml
+        //         // console.log()
+        //     } else {
+        //         alert("Произошла ошика при загрузке пользователей")
+        //     }
+        // }
+
+    </script>
+
+</div>
 </body>
 </html>

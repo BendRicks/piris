@@ -12,6 +12,7 @@ import ru.bendricks.piris.model.Currency;
 import ru.bendricks.piris.service.AccountService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +23,11 @@ public class AccountController {
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<Account> getCurrentUserAccounts(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return accountService.getAccountsByUserId(userDetails.getId());
+    public Map<String, List<Account>> getCurrentUserAccounts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        var allAccounts = accountService.getAccountsByUserId(userDetails.getId());
+        return Map.of("payment", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3014).toList(),
+                "deposit", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 3404 || account.getAccountType().getCode() == 3470).toList(),
+                "credit", allAccounts.stream().filter(account -> account.getAccountType().getCode() == 2400 || account.getAccountType().getCode() == 2470).toList());
     }
 
     @GetMapping("/user/{id}/all")
