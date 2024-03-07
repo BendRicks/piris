@@ -46,24 +46,24 @@
 </div>
 <div class="navigation-bar">
     <div class="tablinks active" id="defaultOpen" onclick="openTab(event, 'Personal')">
-        <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="60%">
-        <p>Личная информация</p>
+        <img src="https://cdn-icons-png.flaticon.com/128/942/942799.png" width="50%">
+        <p class="nav-discription">Личная информация</p>
     </div>
     <div class="tablinks" onclick="openTab(event, 'Accounts')">
         <img src="https://cdn-icons-png.flaticon.com/128/5605/5605921.png" width="70%">
-        <p>Счета</p>
+        <p class="nav-discription">Счета</p>
     </div>
     <div class="tablinks" onclick="openTab(event, 'Obligations')">
         <img src="https://cdn-icons-png.flaticon.com/128/8898/8898421.png" width="70%">
-        <p>Договоры</p>
+        <p class="nav-discription">Договоры</p>
     </div>
     <a class="navigation-bar-element">
         <img src="https://cdn-icons-png.flaticon.com/128/584/584072.png" width="60%">
-        <p>ATM</p>
+        <p class="nav-discription">ATM</p>
     </a>
     <a sec:authorize="hasRole('ADMIN')" style="text-decoration: none" href="/admin" class="navigation-bar-element">
         <img src="https://cdn-icons-png.flaticon.com/128/12534/12534727.png" width="60%">
-        <p>Администрирование</p>
+        <p class="nav-discription">ADMIN</p>
     </a>
     <form action="/auth/logout" method="post" class="navigation-bar-element">
         <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">

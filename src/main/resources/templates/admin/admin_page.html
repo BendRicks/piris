@@ -175,8 +175,8 @@
 </div>
 
 <div class="modal-container" id="account-modal" style="display: none">
-    <div class="modal-background" id="account-modal-bg"></div>
-    <div class="modal-window">
+    <div class="modal-background-small" id="account-modal-bg"></div>
+    <div class="modal-window-small">
         <div class="modal-window-header">
             <p>Создать счет</p>
             <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"
@@ -276,6 +276,7 @@
 <!--        <p>Договоры</p>-->
 <!--    </div>-->
     <a href="/main" class="navigation-bar-element">
+        <img src="https://cdn-icons-png.flaticon.com/128/263/263115.png" width="60%">
         На главную
     </a>
     <form action="/auth/logout" method="post" class="navigation-bar-element">
@@ -285,15 +286,7 @@
 </div>
 
 <div class="main-page">
-    <div id="AllUsers" class="admin-tab-content" style="display: block;">
-
-    </div>
-
-    <div id="Accounts" class="admin-tab-content">
-
-    </div>
-
-    <div id="Obligations" class="admin-tab-content">
+    <div id="AllUsers" style="display: block;width: 90%;margin: 0 auto;">
 
     </div>
 
@@ -314,7 +307,7 @@
         }
 
         function openAdminTab(evt, tabName) {
-            let i, tabcontent, tablinks, current;
+            let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("admin-tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
@@ -471,7 +464,7 @@
                         </div>
                         <div class="modal-window-content-row">
                             <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
-                            <a href="/auth/edit/${user.id}">Изменить</a>
+                            <button value="Изменить" onclick="deleteUser(${user.id})">Изменить</button>
                         </div>
                         `
                 await getAccountsByUserId(id)
