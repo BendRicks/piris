@@ -33,7 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain getSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signin", "/css/*").permitAll()
+                        .requestMatchers("/atm/**").hasRole("ATM")
+                        .requestMatchers("/auth/signin", "/auth/atm/**", "/css/*").permitAll()
                         .anyRequest().authenticated())
                 .userDetailsService(customUserDetailsService)
                 .logout(logout -> logout.logoutUrl("/auth/logout"))

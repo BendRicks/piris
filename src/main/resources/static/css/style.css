@@ -246,7 +246,10 @@ p {
     flex-direction: column;
     top: 0px;
     left: 0px;
-    width: 10%;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 5vw;
+    min-width: 80px;
     height: 100%;
     background: #a1f3f3;
 }
@@ -256,9 +259,8 @@ p {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin: 0 auto;
-    padding: 5% 5% 5% 5%;
-    margin-top: 4vh;
+    margin: 4vh auto;
+    padding: 5%;
     font-family: Arial, sans-serif;
     cursor: pointer;
 }
@@ -288,32 +290,14 @@ p {
     height: 10%;
 }
 
-.admin-tablinks{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 0 auto;
-    padding: 2vh 2vh 2vh 2vh;
-
-    font-family: Arial, sans-serif;
-    cursor: pointer;
-}
-
 .admin-navigation-bar div.active{
     background: #c0efff;
     border-radius: 5vh;
 }
 
-.admin-tab-content {
-    display: none;
-    width: 90%;
-    margin: 0 auto;
-}
-
 .nav-discription{
     margin: 0 auto;
-    font-size: 1.5vw;
+    font-size: 12px;
     text-align: center;
 }
 
@@ -363,6 +347,10 @@ p {
     overflow: hidden;
 }
 
+.nav-image {
+    min-width: 50px;
+}
+
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 .active, .accordion:hover {
     background-color: #ccc;
@@ -376,4 +364,19 @@ p {
     background-color: white;
     display: none;
     overflow: hidden;
+}
+
+.panel-first-line {
+    display: flex;
+    justify-content: space-around;
+    overflow: hidden;
+}
+
+.panel-card-item {
+    text-align: center;
+    width: 90%;
+    margin: 0 auto 5px;
+    padding: 5px;
+    background: lightblue;
+    border-radius: 5px;
 }
