@@ -67,4 +67,14 @@ public class AccountController {
         return accountService.getPaymentAccounts(userId, currency);
     }
 
+    @PostMapping("/{iban}/card/issue")
+    public void issueCard(@PathVariable(name = "iban") String iban) throws Exception {
+        accountService.createPaymentCard(iban);
+    }
+
+    @PostMapping("/card/{cardNo}/update_credentials")
+    public Map<String, String> updateCardCredentials(@PathVariable(name = "cardNo") Long cardNo, @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
+        return Map.of("message", accountService.updateCardCredentials(cardNo, userDetails));
+    }
+
 }

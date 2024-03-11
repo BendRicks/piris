@@ -93,7 +93,8 @@ public class ObligationService {
     }
 
     //    @Scheduled(cron = "* * 12 * * MON-SUN")
-    @Scheduled(cron = "30 * * * * MON-SUN")
+//    @Scheduled(cron = "30 * * * * MON-SUN")
+    @Scheduled(cron = "0 0 */4 * * MON-SUN")
     @Transactional
     public void bankDayClose() {
         log.info("Запущена процедура закрытия банковского дня");
@@ -107,8 +108,8 @@ public class ObligationService {
         var obligations = obligationRepository.findAll();
         obligations.stream().filter(obligation -> obligation.getStatus().equals(RecordStatus.ACTIVE))
                 .forEach(obligation -> {
-                    if (true) {
-//                    if (checkIfCalcDay(obligation.getStartTime(), obligation.getEndTime())) {
+//                    if (true) {
+                    if (checkIfCalcDay(obligation.getStartTime(), obligation.getEndTime())) {
                         switch (obligation.getObligationType()) {
                             case DEPOSIT -> {
                                 log.info("(Депозит) Происходит расчет процентов для договора " + obligation.getContractNumber());

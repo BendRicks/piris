@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <script th:inline="javascript">
+        var _csrfToken = [[${_csrf.token}]]
+    </script>
+</head>
+<body class="main">
+<!--/*@thymesVar id="user" type="ru.bendricks.piris.model.User"*/-->
+<form action="/atm/put_money" method="post" class="register-form">
+    <h2 class="register-form-header">АТМ</h2>
+    <input type="hidden" th:name="${_csrf.getParameterName()}" th:value="${_csrf.token}">
+    <label>
+        Количество к пополнению
+        <input required type="number" class="text-input" id="amount" name="amount" pattern="\d{16}">
+    </label>
+    <button onclick="putMoney(event)">Пополнить</button>
+    <script>
+        async function putMoney(ev) {
+            ev.preventDefault()
+            let response = await fetch(`/atm/put_money`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    amount: document.getElementById('amount').value * 100
+                }),
+                headers: {
+                    'content-type': 'application/json',
+                    'X-CSRF-TOKEN': _csrfToken
+                }
+            })
+            if (response.status == 200) {
+                alert("Счет пополнен успешно")
+                location.href = "/atm/main"
+            } else {
+                let error = await response.json()
+                alert(error.errorMessage)
+            }
+        }
+    </script>
+</form>
+</body>
+</html>

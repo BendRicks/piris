@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+<body class="main">
+<!--/*@thymesVar id="user" type="ru.bendricks.piris.model.User"*/-->
+<div style="justify-content: center; align-items: center; flex-direction: column">
+    <!--/*@thymesVar id="balance" type="java.lang.String"*/-->
+    <p th:text="${balance}"></p>
+    <a href="/atm/main">На главную</a>
+</div>
+</body>
+</html>

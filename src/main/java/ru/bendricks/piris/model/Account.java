@@ -28,7 +28,6 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "acc_type_code", referencedColumnName = "code")
-//    @JsonManagedReference("acc-type")
     private AccountType accountType;
 
     @Column(name = "status")
@@ -36,7 +35,6 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
-//    @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User owner;
 
@@ -62,5 +60,8 @@ public class Account {
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Transaction> transactionsAsRecipient;
+
+    @OneToMany(mappedBy = "account")
+    private List<Card> cards;
 
 }
