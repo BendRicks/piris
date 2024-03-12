@@ -12,7 +12,6 @@ import ru.bendricks.piris.repository.ObligationPlanRepository;
 import ru.bendricks.piris.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -59,8 +58,8 @@ public class InitConfig {
 
             obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.DEPOSIT, Currency.BYN, "Депозит МТБелки online", 13.2, 36, null));
 
-            obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT_ANUAL, Currency.BYN, "Кредит на готовое жилье от застройщика", 14.5, 240, null));
-            obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT_ANUAL, Currency.BYN, "Кредит на недвижимость «Счастливы в месте»", 0.001, 360, null));
+            obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT_ANUIT, Currency.BYN, "Кредит на готовое жилье от застройщика", 14.5, 240, null));
+            obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT_ANUIT, Currency.BYN, "Кредит на недвижимость «Счастливы в месте»", 0.001, 360, null));
             obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT, Currency.BYN, "Потребительский кредит «Проще простого»", 9.99, 84, null));
             obligationPlanRepository.save(new ObligationPlan(null, RecordStatus.ACTIVE, ObligationType.CREDIT, Currency.BYN, "Потребительский кредит «Большие планы»", 6.99, 84, null));
         }
