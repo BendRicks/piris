@@ -126,6 +126,7 @@ async function getObligations() {
                     <div class="panel">
                         <p>Депозитный план: ${creditObl.obligationPlan.name} ${creditObl.obligationPlan.planPercent}% ${creditObl.obligationPlan.currency} до ${creditObl.obligationPlan.months} месяцев</p>
                         <p>Сумма вклада: ${creditObl.amount / 100} ${creditObl.currency}</p>
+                        <a href="/obligations/${creditObl.id}/payments">План выплат</a>
                         <div class="account-item">
                             <p>Имя: ${creditObl.mainAccount.name}</p>
                             <p>Тип: ${creditObl.mainAccount.accountType.description}</p>

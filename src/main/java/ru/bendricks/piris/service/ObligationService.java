@@ -191,7 +191,7 @@ public class ObligationService {
                                         obligation.getPercentAccount().setStatus(RecordStatus.END_OF_SERVICE);
                                 }
                             }
-                            case CREDIT_ANUAL -> {
+                            case CREDIT_ANUIT -> {
                                 var monthPercent = obligation.getObligationPlan().getPlanPercent() / 1200;
                                 var months = ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
                                 var anuitCoeff = (monthPercent * Math.pow(1 + monthPercent, months)) / (Math.pow(1 + monthPercent, months) - 1);
