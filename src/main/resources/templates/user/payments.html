@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <script th:inline="javascript">
+        var _csrfToken = [[${_csrf.token}]]
+    </script>
+</head>
+<body class="main main-dop">
+<div th:each="oblPayment : ${oblPayments}" style="flex-direction: row; align-content: space-around">
+
+</div>
+</body>
+</html>

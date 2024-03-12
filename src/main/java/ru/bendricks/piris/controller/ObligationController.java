@@ -5,13 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.dto.ObligationCreateDTO;
 import ru.bendricks.piris.model.*;
 import ru.bendricks.piris.service.AccountService;
 import ru.bendricks.piris.service.ObligationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +62,15 @@ public class ObligationController {
         return Map.of("deposit", obligations.stream().filter(obligation -> obligation.getObligationType() == ObligationType.DEPOSIT || obligation.getObligationType() == ObligationType.DEPOSIT_UNTOUCH).toList(),
                 "credit", obligations.stream().filter(obligation -> obligation.getObligationType() == ObligationType.CREDIT || obligation.getObligationType() == ObligationType.CREDIT_ANUAL).toList());
     }
+
+    @GetMapping("/{oblId}/payments")
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView getPaymentsOnCredit(@PathVariable(name = "oblId") Long oblId) {
+        var model = new HashMap<String, Object>();
+//        mode
+        return new ModelAndView("user/payments", model);
+    }
+
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
