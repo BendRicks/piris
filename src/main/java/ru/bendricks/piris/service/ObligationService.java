@@ -37,6 +37,7 @@ public class ObligationService {
     private final ObligationPlanRepository obligationPlanRepository;
     private final UserRepository userRepository;
     private final AccountService accountService;
+    private final CurrencyRateService currencyRateService;
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -45,7 +46,8 @@ public class ObligationService {
         obligation.getOwner().setObligations(List.of(obligation));
         obligation.setContractNumber(generateContractNumber());
         obligation.setEndTime(obligation.getStartTime().plus(createDTO.getMonths(), ChronoUnit.MONTHS));
-        var obligationPlan = obligationPlanRepository.findById(obligation.getObligationPlan().getId()).orElse(null);
+        var obligationPlan = obligationPlanRepository.findById(obligation.getObligationPlan().getId())
+                .orElseThrow(() -> new Exception("Договорной план не был найден"));
         obligation.setObligationType(obligationPlan.getObligationType());
         obligation.setAmount(createDTO.getStartBalance());
         obligation.setCurrency(obligationPlan.getCurrency());
@@ -63,7 +65,8 @@ public class ObligationService {
         obligation.getOwner().setObligations(List.of(obligation));
         obligation.setContractNumber(generateContractNumber());
         obligation.setEndTime(obligation.getStartTime().plus(createDTO.getMonths(), ChronoUnit.MONTHS));
-        var obligationPlan = obligationPlanRepository.findById(obligation.getObligationPlan().getId()).orElse(null);
+        var obligationPlan = obligationPlanRepository.findById(obligation.getObligationPlan().getId())
+                .orElseThrow(() -> new Exception("Договорной план не был найден"));
         obligation.setObligationType(obligationPlan.getObligationType());
         obligation.setAmount(createDTO.getStartBalance());
         obligation.setCurrency(obligationPlan.getCurrency());
@@ -98,6 +101,7 @@ public class ObligationService {
     @Transactional
     public void bankDayClose() {
         log.info("Запущена процедура закрытия банковского дня");
+        currencyRateService.updateRates();
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         User user = new User("admin", "password", true, true, true, true, grantedAuthorities);

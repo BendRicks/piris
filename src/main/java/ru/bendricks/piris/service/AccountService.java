@@ -49,6 +49,7 @@ public class AccountService {
     private final CardRepository cardRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final CurrencyRateService currencyRateService;
 
     private final Set<Integer> permittedSenderAccountTypes = Set.of(3014, 3470, 2400, 1010, 7327);
 
@@ -87,9 +88,26 @@ public class AccountService {
             if (senderAccount.getBalance() < transaction.getAmount())
                 throw new Exception("Недостаточно денег на балансе отправителя");
         }
-        if (senderAccount.getCurrency() != recipientAccount.getCurrency())
-            throw new Exception("Невозможно перевести деньги на счёт с другой валютой");
         senderAccount.setBalance(senderAccount.getBalance() - transaction.getAmount());
+        if (senderAccount.getCurrency() == recipientAccount.getCurrency()) {
+            recipientAccount.setBalance(recipientAccount.getBalance() + transaction.getAmount());
+        } else {
+            var senderCurrencySfrb = getSfrbAccount(senderAccount.getCurrency()).orElseThrow(() -> new Exception("Счет сфрб не был найден"));
+            var recipientCurrencySfrb = getSfrbAccount(recipientAccount.getCurrency()).orElseThrow(() -> new Exception("Счет сфрб не был найден"));
+            senderCurrencySfrb.setBalance(senderCurrencySfrb.getBalance() + transaction.getAmount());
+            var amountInByn = switch (senderAccount.getCurrency()) {
+                case USD -> currencyRateService.getUsdBuyInByn() * transaction.getAmount();
+                case EUR -> currencyRateService.getEurBuyInByn() * transaction.getAmount();
+                default -> (double)transaction.getAmount();
+            };
+            var amountInRecipientCurrency = switch (recipientAccount.getCurrency()) {
+                case USD -> (long)(amountInByn / currencyRateService.getUsdSellInByn());
+                case EUR -> (long)(amountInByn / currencyRateService.getEurSellInByn());
+                default -> (long) amountInByn;
+            };
+            recipientCurrencySfrb.setBalance(recipientCurrencySfrb.getBalance() - amountInRecipientCurrency);
+            recipientAccount.setBalance(recipientAccount.getBalance() + amountInRecipientCurrency);
+        }
         if (senderAccount.getBalance() == 0 && senderAccount.getStatus() == RecordStatus.END_OF_SERVICE) {
             senderAccount.setStatus(RecordStatus.CLOSED);
             var parentObligation = Optional.of(senderAccount.getParentObligationAsMainAccount()).orElse(senderAccount.getParentObligationAsPercentAccount());
@@ -98,10 +116,9 @@ public class AccountService {
                 parentObligation.setStatus(RecordStatus.CLOSED);
             }
         }
-        recipientAccount.setBalance(recipientAccount.getBalance() + transaction.getAmount());
         if (recipientAccount.getBalance() >= 0 && recipientAccount.getStatus() == RecordStatus.END_OF_SERVICE) {
             recipientAccount.setStatus(RecordStatus.CLOSED);
-            var parentObligation = Optional.of(senderAccount.getParentObligationAsMainAccount()).orElse(senderAccount.getParentObligationAsPercentAccount());
+            var parentObligation = Optional.of(recipientAccount.getParentObligationAsMainAccount()).orElse(recipientAccount.getParentObligationAsPercentAccount());
             if (parentObligation.getMainAccount().getStatus() == RecordStatus.CLOSED
                     && parentObligation.getPercentAccount().getStatus() == RecordStatus.CLOSED) {
                 parentObligation.setStatus(RecordStatus.CLOSED);

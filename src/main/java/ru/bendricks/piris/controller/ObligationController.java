@@ -11,6 +11,7 @@ import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.dto.CreditPaymentDTO;
 import ru.bendricks.piris.dto.ObligationCreateDTO;
 import ru.bendricks.piris.model.*;
+import ru.bendricks.piris.service.CurrencyRateService;
 import ru.bendricks.piris.service.ObligationService;
 
 import java.time.Year;
@@ -27,6 +28,14 @@ import java.util.Map;
 public class ObligationController {
 
     private final ObligationService obligationService;
+    private final CurrencyRateService currencyRateService;
+
+    @GetMapping("/currencies")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Double> getCurrencies() {
+        return Map.of("eurBuy", currencyRateService.getEurBuyInByn(), "eurSell", currencyRateService.getEurSellInByn(),
+                "usdBuy", currencyRateService.getUsdBuyInByn(), "usdSell", currencyRateService.getUsdSellInByn());
+    }
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)

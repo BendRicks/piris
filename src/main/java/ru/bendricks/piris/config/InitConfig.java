@@ -10,6 +10,7 @@ import ru.bendricks.piris.repository.AccountRepository;
 import ru.bendricks.piris.repository.AccountTypeRepository;
 import ru.bendricks.piris.repository.ObligationPlanRepository;
 import ru.bendricks.piris.repository.UserRepository;
+import ru.bendricks.piris.service.CurrencyRateService;
 
 import java.time.LocalDate;
 
@@ -22,6 +23,7 @@ public class InitConfig {
     private final AccountTypeRepository accountTypeRepository;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final CurrencyRateService currencyRateService;
 
     @Value("${sfrbIBANByn}")
     private String sfrbIBANByn;
@@ -96,7 +98,7 @@ public class InitConfig {
             log.info("Счет кассы (EUR) не был найден. Будет создана запись");
             accountRepository.saveAndFlush(new Account(cashIBANEur, "Касса Банка EUR", accountTypeRepository.findById(1010).orElse(null), RecordStatus.ACTIVE, adminUser, 0, Currency.EUR, null, null, null, null, null));
         }
-//        log.info("Курс доллара - " + Currency.USD.getRate());
+        currencyRateService.updateRates();
     }
 
 }
