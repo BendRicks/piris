@@ -11,7 +11,6 @@ import ru.bendricks.piris.config.CustomUserDetails;
 import ru.bendricks.piris.dto.CreditPaymentDTO;
 import ru.bendricks.piris.dto.ObligationCreateDTO;
 import ru.bendricks.piris.model.*;
-import ru.bendricks.piris.service.AccountService;
 import ru.bendricks.piris.service.ObligationService;
 
 import java.time.Year;
@@ -28,7 +27,6 @@ import java.util.Map;
 public class ObligationController {
 
     private final ObligationService obligationService;
-    private final AccountService accountService;
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
@@ -75,25 +73,25 @@ public class ObligationController {
         List<CreditPaymentDTO> paymentsList;
         switch (obligation.getObligationType()) {
             case CREDIT -> {
-                paymentsList = new ArrayList<CreditPaymentDTO>();
+                paymentsList = new ArrayList<>();
                 var months = ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
                 for (var monthsFromStart = 1; monthsFromStart <= months; monthsFromStart++) {
                     var date = obligation.getStartTime().plus(monthsFromStart, ChronoUnit.MONTHS);
                     long mainDebtMonthPart = (obligation.getAmount() / months);
                     var q = obligation.getAmount() - (monthsFromStart * mainDebtMonthPart);
                     var payment = (long) (mainDebtMonthPart + ((q * obligation.getObligationPlan().getPlanPercent() / 100 * YearMonth.of(date.getYear(), date.getMonth()).lengthOfMonth()) / Year.of(date.getYear()).length()));
-                    paymentsList.add(CreditPaymentDTO.builder().date(date).amount(payment).build());
+                    paymentsList.add(CreditPaymentDTO.builder().date(date).amount((double)payment/100).build());
                 }
             }
             case CREDIT_ANUIT -> {
-                paymentsList = new ArrayList<CreditPaymentDTO>();
+                paymentsList = new ArrayList<>();
                 var months = ChronoUnit.MONTHS.between(obligation.getStartTime(), obligation.getEndTime().plus(1, ChronoUnit.DAYS));
                 var monthPercent = obligation.getObligationPlan().getPlanPercent() / 1200;
                 var anuitCoeff = (monthPercent * Math.pow(1 + monthPercent, months)) / (Math.pow(1 + monthPercent, months) - 1);
                 var monthSum = (long) (obligation.getAmount() * anuitCoeff);
                 for (var monthsFromStart = 1; monthsFromStart <= months; monthsFromStart++) {
                     var date = obligation.getStartTime().plus(monthsFromStart, ChronoUnit.MONTHS);
-                    paymentsList.add(CreditPaymentDTO.builder().date(date).amount(monthSum).build());
+                    paymentsList.add(CreditPaymentDTO.builder().date(date).amount((double)monthSum/100).build());
                 }
             }
             default -> throw new Exception("Не кредит");
