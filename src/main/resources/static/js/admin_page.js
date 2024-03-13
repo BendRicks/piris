@@ -232,7 +232,7 @@ async function getAccountsByUserId(id) {
                     <div class="panel">
                         <div class="panel-first-line">
                             <p>Статус: ${recordStatusEnum[depositAcc.status]}</p>
-                            <p>IBAN: ${paymAcc.iban}</p>
+                            <p>IBAN: ${depositAcc.iban}</p>
                         </div>
                     </div>
                     `
