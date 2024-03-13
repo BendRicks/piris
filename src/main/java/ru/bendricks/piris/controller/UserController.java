@@ -29,7 +29,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteUser(@PathVariable("id") long id) {
+    public void deleteUser(@PathVariable("id") long id) throws Exception {
         userService.deleteUser(id);
     }
 

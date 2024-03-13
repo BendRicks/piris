@@ -289,9 +289,14 @@ p {
     height: 10%;
 }
 
+.admin-navigation-bar .tablinks{
+    padding: 1vw;
+}
+
 .admin-navigation-bar div.active{
     background: #c0efff;
     border-radius: 5vh;
+    padding: 1vw;
 }
 
 .nav-discription{

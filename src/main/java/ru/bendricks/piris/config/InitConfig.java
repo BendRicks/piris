@@ -38,14 +38,14 @@ public class InitConfig {
 
     @PostConstruct
     public void init() {
-        User adminUser = userRepository.findUserByEmail("bank@bank.bank").orElse(null);
+        User adminUser = userRepository.findUserByEmail("bank@gmail.com").orElse(null);
         if (adminUser == null) {
             log.info("Не был найден ни один аккаунт. Будет создана запись");
-            adminUser = new User(null, RecordStatus.ACTIVE, UserRole.ROLE_ADMIN, "$2a$12$eGOIoJpMlGz2HQnRuK0EueD1mZOk2ALUm5QZBpNbRWwGQjyWFouEq",
+            adminUser = new User(null, RecordStatus.ACTIVE, UserRole.ROLE_ADMIN, "$2y$10$mJriDHm56IoyKmzZPmr/wue7ofdi6q5Wr8aTmlVQ3icua0/ybSs0y",
                     "Банк", "Банк", "Банк", LocalDate.now(), Sex.ATTACK_HELICOPTER,
                     "BY1234567", "bank", LocalDate.now(), "5111111A001PB0", "bank",
                     City.MINSK, "bank", "+375170000000", "+375290000000",
-                    "bank@bank.bank", "bank", MaritalStatus.SINGLE,
+                    "bank@gmail.com", "bank", MaritalStatus.SINGLE,
                     Citizenship.REPUBLIC_OF_BELARUS, Disability.NO, false, 0L, null, null);
             userRepository.saveAndFlush(adminUser);
         }

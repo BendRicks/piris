@@ -78,7 +78,7 @@ async function openUserModal(id) {
                         </div>
                         <div class="modal-window-content-row">
                             <button value="Удалить" onclick="deleteUser(${user.id})">Удалить</button>
-                            <button value="Изменить" onclick="deleteUser(${user.id})">Изменить</button>
+                            <button value="Изменить" onclick="updateUserModel(${user.id})">Изменить</button>
                         </div>
                         `
         await getAccountsByUserId(id)
@@ -374,11 +374,63 @@ async function getObligationsByUserId(id) {
 }
 
 async function createUserModel() {
+    document.getElementById('id').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('surname').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('givenName').value = '';
+    document.getElementById('birthDate').value = '';
+    document.getElementById('sex').value = '';
+    document.getElementById('passportSerial').value = '';
+    document.getElementById('competentOrgan').value = '';
+    document.getElementById('dateOfIssue').value = '';
+    document.getElementById('passportId').value = '';
+    document.getElementById('birthLocation').value = '';
+    document.getElementById('cityOfResidence').value = '';
+    document.getElementById('addressOfLiving').value = '';
+    document.getElementById('homePhoneNumber').value = '';
+    document.getElementById('mobilePhoneNumber').value = '';
+    document.getElementById('placeOfResidence').value = '';
+    document.getElementById('maritalStatus').value = '';
+    document.getElementById('citizenship').value = '';
+    document.getElementById('disability').value = '';
+    document.getElementById('pensioner').value = '';
+    document.getElementById('monthlyIncome').value = '';
+    document.getElementById('user-create-button').onclick = (event) => {
+        createNewUser(event);
+        console.log('aboba');
+    };
     await userModel({});
 }
 
 async function updateUserModel(id) {
     let user = await getUser(id);
+    document.getElementById('id').value = user.id;
+    document.getElementById('email').value = user.email;
+    document.getElementById('surname').value = user.surname;
+    document.getElementById('name').value = user.name;
+    document.getElementById('givenName').value = user.givenName;
+    document.getElementById('birthDate').value = user.birthDate;
+    document.getElementById('sex').value = user.sex;
+    document.getElementById('passportSerial').value = user.passportSerial;
+    document.getElementById('competentOrgan').value = user.competentOrgan;
+    document.getElementById('dateOfIssue').value = user.dateOfIssue;
+    document.getElementById('passportId').value = user.passportId;
+    document.getElementById('birthLocation').value = user.birthLocation;
+    document.getElementById('cityOfResidence').value = user.cityOfResidence;
+    document.getElementById('addressOfLiving').value = user.addressOfLiving;
+    document.getElementById('homePhoneNumber').value = user.homePhoneNumber;
+    document.getElementById('mobilePhoneNumber').value = user.mobilePhoneNumber;
+    document.getElementById('placeOfResidence').value = user.placeOfResidence;
+    document.getElementById('maritalStatus').value = user.maritalStatus;
+    document.getElementById('citizenship').value = user.citizenship;
+    document.getElementById('disability').value = user.disability;
+    document.getElementById('pensioner').value = user.pensioner;
+    document.getElementById('monthlyIncome').value = user.monthlyIncome;
+    document.getElementById('user-create-button').onclick = (event) => {
+        updateUser(event);
+        console.log('aboba edit');
+    };
     await userModel(user);
 }
 
@@ -488,6 +540,51 @@ async function createNewUser(ev) {
     })
     if (response.status == 200) {
         alert("Создание пользователя прошло успешно")
+        location.reload()
+        // document.getElementById("user-modal").style.display = 'none'
+    } else {
+        let error = await response.json();
+        alert(JSON.stringify(error.errors));
+    }
+}
+
+async function updateUser(ev) {
+    ev.preventDefault()
+    let formData = new FormData(document.getElementById('create-user-form'))
+    let userData = {
+        id: formData.get('id'),
+        email: formData.get('email'),
+        surname: formData.get('surname'),
+        name: formData.get('name'),
+        givenName: formData.get('givenName'),
+        birthDate: formData.get('birthDate'),
+        sex: formData.get('sex'),
+        passportSerial: formData.get('passportSerial'),
+        competentOrgan: formData.get('competentOrgan'),
+        dateOfIssue: formData.get('dateOfIssue'),
+        passportId: formData.get('passportId'),
+        birthLocation: formData.get('birthLocation'),
+        cityOfResidence: formData.get('cityOfResidence'),
+        addressOfLiving: formData.get('addressOfLiving'),
+        homePhoneNumber: formData.get('homePhoneNumber'),
+        mobilePhoneNumber: formData.get('mobilePhoneNumber'),
+        placeOfResidence: formData.get('placeOfResidence'),
+        maritalStatus: formData.get('maritalStatus'),
+        citizenship: formData.get('citizenship'),
+        disability: formData.get('disability'),
+        pensioner: formData.get('pensioner'),
+        monthlyIncome: formData.get('monthlyIncome'),
+    }
+    let response = await fetch(`/users/edit`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+            'content-type': 'application/json',
+            'X-CSRF-TOKEN': _csrfToken
+        }
+    })
+    if (response.status == 200) {
+        alert("Изменение пользователя прошло успешно")
         location.reload()
         // document.getElementById("user-modal").style.display = 'none'
     } else {
