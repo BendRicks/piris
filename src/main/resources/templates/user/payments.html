@@ -15,7 +15,7 @@
 <div th:each="oblPayment : ${oblPayments}" style="display: flex; width: 60%; flex-direction: column; align-content: space-around">
     <div class="payment-row">
         <div th:text="${oblPayment.date}"></div>
-        <div th:text="${oblPayment.amount / 100}"></div>
+        <div th:text="${oblPayment.amount}"></div>
     </div>
 </div>
 </body>
