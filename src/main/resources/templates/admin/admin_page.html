@@ -9,6 +9,7 @@
     <script th:inline="javascript">
         var _csrfToken = [[${_csrf.token}]]
     </script>
+    <script src="https://unpkg.com/imask"></script>
 </head>
 <body class="main main-dop">
 <div class="modal-container" id="modal" style="display: none">
@@ -136,6 +137,25 @@
                             Мобильный телефон (+37529...)
                             <input type="text" class="text-input" name="mobilePhoneNumber" id="mobilePhoneNumber" pattern="+375\d{9}">
                         </label>
+                        <script>
+                            const homeNumber = document.getElementById('homePhoneNumber');
+                            const mobileNumber = document.getElementById('mobilePhoneNumber');
+                            const passportSerial = document.getElementById('passportSerial');
+                            const passportId = document.getElementById('passportId');
+
+                            const mask1 = IMask(homeNumber, {
+                                mask: "+{375(17)}000-00-00"
+                            });
+                            const mask2 = IMask(mobileNumber, {
+                                mask: "+{375(29)}000-00-00"
+                            });
+                            const mask3 = IMask(passportSerial, {
+                                mask: "aa0000000"
+                            });
+                            const mask4 = IMask(passportId, {
+                                mask: "0000000a000aa0"
+                            });
+                        </script>
                         <label class="input-label">
                             Адрес прописки
                             <input required type="text" class="text-input" name="placeOfResidence" id="placeOfResidence">
@@ -168,7 +188,7 @@
                         </label>
                     </div>
                 </div>
-                <button class="send-button" onclick="createNewUser(event)">Создать</button>
+                <button class="send-button" id="user-create-button" >Создать</button>
             </form>
         </div>
     </div>
@@ -212,8 +232,8 @@
 </div>
 
 <div class="modal-container" id="obligation-modal" style="display: none">
-    <div class="modal-background" id="obligation-modal-bg"></div>
-    <div class="modal-window">
+    <div class="modal-background-small" id="obligation-modal-bg"></div>
+    <div class="modal-window-small-obligations">
         <div class="modal-window-header">
             <p>Создать счет</p>
             <svg class="modal-window-header-cross" xmlns="http://www.w3.org/2000/svg"

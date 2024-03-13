@@ -12,9 +12,11 @@
     </script>
 </head>
 <body class="main main-dop">
-<div th:each="oblPayment : ${oblPayments}" style="flex-direction: row; align-content: space-around">
-    <p th:text="${oblPayment.date}"></p>
-    <p th:text="${oblPayment.amount}"></p>
+<div th:each="oblPayment : ${oblPayments}" style="display: flex; width: 60%; flex-direction: column; align-content: space-around">
+    <div class="payment-row">
+        <div th:text="${oblPayment.date}"></div>
+        <div th:text="${oblPayment.amount}"></div>
+    </div>
 </div>
 </body>
 </html>
