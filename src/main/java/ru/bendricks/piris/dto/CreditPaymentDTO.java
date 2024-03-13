@@ -16,6 +16,6 @@ import java.time.LocalDate;
 public class CreditPaymentDTO {
 
     private LocalDate date;
-    private Long amount;
+    private Double amount;
 
 }
